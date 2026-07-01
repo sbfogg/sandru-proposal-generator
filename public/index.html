@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposal Generator — Sandru Technologies</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #C0392B;
+    --red-dark: #922B21;
+    --red-light: #FADBD8;
+    --gray-50: #F8F9FA;
+    --gray-100: #F1F3F4;
+    --gray-200: #E2E6EA;
+    --gray-400: #9AA0A6;
+    --gray-600: #5F6368;
+    --gray-800: #3C4043;
+    --gray-900: #202124;
+    --white: #FFFFFF;
+    --radius: 8px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  header {
+    background: var(--gray-900);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 32px; height: 32px; background: var(--red);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 18px; height: 18px; fill: white; }
+  .logo-text { color: white; font-weight: 600; font-size: 15px; letter-spacing: -0.2px; }
+  .logo-sub { color: var(--gray-400); font-size: 13px; font-weight: 400; margin-left: 4px; }
+
+  .type-bar {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .type-bar::-webkit-scrollbar { display: none; }
+  .type-btn {
+    padding: 14px 16px;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .type-btn:hover { color: var(--gray-900); }
+  .type-btn.active { color: var(--red); border-bottom-color: var(--red); }
+
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  .card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 16px;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  label.field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 5px;
+  }
+  input[type=text], input[type=number], select, textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--gray-900);
+    background: white;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+  }
+  textarea { resize: vertical; min-height: 76px; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239AA0A6' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+
+  .cb-list { display: flex; flex-direction: column; gap: 10px; }
+  .cb-row { display: flex; align-items: center; gap: 10px; }
+  .cb-row input[type=checkbox] { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--red); cursor: pointer; }
+  .cb-row .cb-label { font-size: 14px; flex: 1; cursor: pointer; }
+  .cb-row .cb-qty { width: 56px; padding: 6px 8px; font-size: 13px; }
+  .cb-qty:disabled { background: var(--gray-100); color: var(--gray-400); }
+
+  .add-btn {
+    background: none; border: 1px dashed var(--gray-200); border-radius: var(--radius);
+    color: var(--red); font-family: inherit; font-size: 13px; font-weight: 500;
+    padding: 8px 14px; cursor: pointer; margin-top: 10px; width: 100%;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: var(--red-light); }
+  .custom-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .custom-row input { flex: 1; }
+  .rm-btn {
+    background: none; border: none; color: var(--gray-400); cursor: pointer;
+    font-size: 18px; padding: 4px; line-height: 1; flex-shrink: 0;
+  }
+  .rm-btn:hover { color: var(--red); }
+
+  /* LINE ITEMS (materials pricing) */
+  .line-items { display: flex; flex-direction: column; gap: 8px; }
+  .line-item-row { display: flex; gap: 8px; align-items: center; }
+  .line-item-row input[type=text] { flex: 1; }
+  .line-item-row input[type=number] { width: 110px; }
+
+  .price-table { width: 100%; font-size: 14px; border-collapse: collapse; }
+  .price-table td { padding: 5px 0; }
+  .price-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .price-table .muted td { color: var(--gray-400); font-size: 13px; }
+  .price-table .total td { font-weight: 600; font-size: 15px; border-top: 1px solid var(--gray-200); padding-top: 10px; margin-top: 6px; }
+
+  .generate-btn {
+    width: 100%; padding: 14px;
+    background: var(--red); color: white;
+    border: none; border-radius: var(--radius-lg);
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+    margin-top: 8px;
+  }
+  .generate-btn:hover { background: var(--red-dark); }
+  .generate-btn:active { transform: scale(0.99); }
+
+  .hidden { display: none !important; }
+
+  .page-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.3px; }
+  .page-sub { font-size: 14px; color: var(--gray-600); margin-bottom: 24px; }
+
+  .note-text { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+
+  .toggle-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--gray-200); border-radius: 24px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-slider:before {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; left: 3px; top: 3px;
+    background: white; border-radius: 50%; transition: transform 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--red); }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+  .toggle-label { font-size: 14px; font-weight: 500; }
+
+  /* SIGN-IN GATE */
+  #signin-gate {
+    position: fixed; inset: 0; background: var(--gray-50);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; flex-direction: column; gap: 16px; text-align: center; padding: 24px;
+  }
+  #signin-gate.hidden { display: none !important; }
+  #signin-gate h1 { font-size: 20px; font-weight: 600; }
+  #signin-gate p { color: var(--gray-600); font-size: 14px; max-width: 320px; }
+  .signin-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    padding: 10px 20px; font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer; box-shadow: var(--shadow);
+  }
+  .signin-btn:hover { background: var(--gray-50); }
+  #signin-error { color: var(--red); font-size: 13px; display: none; }
+  #app-wrap.hidden { display: none !important; }
+  #signout-btn {
+    background: none; border: none; color: var(--gray-400); font-size: 12px;
+    cursor: pointer; font-family: inherit;
+  }
+  #signout-btn:hover { color: white; }
+</style>
+</head>
+<body>
+
+<div id="signin-gate">
+  <h1>Sandru Technologies — Proposal Generator</h1>
+  <p>Sign in with your @sandrutech.com Google account to continue.</p>
+  <button class="signin-btn" id="signin-btn">
+    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.08-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.72c-.18-.54-.28-1.12-.28-1.72s.1-1.18.28-1.72V4.95H.96A8.996 8.996 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.59-2.59C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+    Sign in with Google
+  </button>
+  <p id="signin-error"></p>
+</div>
+
+<div id="app-wrap" class="hidden">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="logo-text">Sandru Technologies <span class="logo-sub">Proposal Generator</span></span>
+  </div>
+  <button id="signout-btn">Sign out</button>
+</header>
+
+<div class="type-bar">
+  <button class="type-btn active" onclick="switchType('butterfly')">🦋 ButterflyMX</button>
+  <button class="type-btn" onclick="switchType('camera')">📷 Camera System</button>
+  <button class="type-btn" onclick="switchType('doorking')">🔧 Doorking Repair</button>
+  <button class="type-btn" onclick="switchType('doorhardware')">🚪 Door Hardware</button>
+  <button class="type-btn" onclick="switchType('wifi')">📶 WiFi / Networking</button>
+  <button class="type-btn" onclick="switchType('accessexpansion')">🔑 Access Expansion</button>
+</div>
+
+<main>
+
+<!-- ===================== BUTTERFLY MX ===================== -->
+<div id="type-butterfly">
+  <p class="page-title">ButterflyMX Access Control</p>
+  <p class="page-sub">New installations, expansions, and intercom replacements.</p>
+
+  <div class="card">
+    <div class="card-title">Client & site</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Company name</label><input type="text" id="bf-company" placeholder="e.g. Allied Residential"></div>
+      <div class="field"><label class="field-label">Primary contact</label><input type="text" id="bf-contact" placeholder="e.g. Kardon Wright"></div>
+    </div>
+    <div class="field"><label class="field-label">CC contacts (comma-separated, optional)</label><input type="text" id="bf-cc" placeholder="e.g. Alek Hadadan, Jake Favale"></div>
+    <div class="field"><label class="field-label">Property / building name</label><input type="text" id="bf-site" placeholder="e.g. Sound View Apartments"></div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Street address</label><input type="text" id="bf-addr" placeholder="e.g. 413 3rd Ave S"></div>
+      <div class="field"><label class="field-label">City, State ZIP</label><input type="text" id="bf-zip" placeholder="Seattle, WA 98020"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">System scope</div>
+    <div class="grid2">
+      <div class="field">
+        <label class="field-label">Job type</label>
+        <select id="bf-jobtype">
+          <option value="new">New installation</option>
+          <option value="expansion">System expansion</option>
+          <option value="replacement">Intercom replacement</option>
+        </select>
+      </div>
+      <div class="field"><label class="field-label">Number of doors controlled</label><input type="number" id="bf-doors" value="" min="1"></div>
+    </div>
+    <div class="field">
+      <label class="field-label">Existing system being replaced</label>
+      <select id="bf-existing">
+        <option value="Doorking">Doorking</option>
+        <option value="Kantech">Kantech</option>
+        <option value="existing keypad">Existing keypad</option>
+        <option value="existing access control system">Generic existing system</option>
+        <option value="none">None (new install)</option>
+        <option value="custom">Custom — specify below</option>
+      </select>
+    </div>
+    <div class="field hidden" id="bf-custom-wrap"><label class="field-label">Custom existing system</label><input type="text" id="bf-custom-sys" placeholder="e.g. Aiphone"></div>
+    <div class="field">
+      <label class="field-label">Cabling approach</label>
+      <select id="bf-cabling">
+        <option value="reuse">Reuse existing cabling</option>
+        <option value="new">Run new cabling</option>
+        <option value="panduit">Run new cabling + Panduit raceway</option>
+        <option value="conduit">Run new cabling + Conduit (WA state law)</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Special notes (unique situations, relocations, etc.)</label><textarea id="bf-notes" placeholder="e.g. Doorking to be relocated to Telco Room; PVC board to cover hole from removed callbox"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ButterflyMX hardware — customer-provided</div>
+    <div class="cb-list" id="bf-bmx-list">
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-0" data-label='ButterflyMX 8" Surface Intercom'><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-0">8" Surface Intercom</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-1" data-label='ButterflyMX 12" Surface Intercom'><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-1">12" Surface Intercom</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-2" data-label='ButterflyMX 12" Recessed Intercom w/ Back Box'><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-2">12" Recessed Intercom w/ Back Box</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-3" data-label="ButterflyMX Two-Door Controller"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-3">Two-Door Controller</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-4" data-label="ButterflyMX Standard Card Reader"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-4">Standard Card Reader</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-5" data-label="ButterflyMX Vehicle Reader w/ Bracket"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-5">Vehicle Reader w/ Bracket</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-6" data-label="ButterflyMX Keypad (Mobile & Fob)"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-6">Keypad (Mobile & Fob)</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-bmx-7" data-label="ButterflyMX Windshield Tags"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-7">Windshield Tags</label></div>
+    </div>
+    <div id="bf-bmx-custom"></div>
+    <button class="add-btn" onclick="addCustom('bf-bmx-custom')">+ Add custom item</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sandru-provided materials</div>
+    <div class="cb-list" id="bf-mat-list">
+      <div class="cb-row"><input type="checkbox" id="bf-mat-0" data-label="Black PVC Board"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-0">Black PVC Board</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-1" data-label="14x16 Steel Housing"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-1">14x16 Steel Housing</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-2" data-label="Electrical Door Strike"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-2">Electrical Door Strike</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-3" data-label="Power Supply for Door Strike"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-3">Power Supply for Door Strike</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-4" data-label="Maglock"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-4">Maglock</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-5" data-label="Networking Switch/Firewall"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-5">Networking Switch / Firewall</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-6" data-label="Router/Firewall"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-6">Router / Firewall</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-7" data-label="UPS Backup Battery"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-7">UPS Backup Battery</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-8" data-label="Altronix Power Supply w/ Backup Battery"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-mat-8">Altronix Power Supply w/ Backup Battery</label></div>
+      <div class="cb-row"><input type="checkbox" id="bf-mat-9" data-label="Cat-5e / Access Control Cabling, Conduit, Connectors, Cable Support"><input type="number" class="cb-qty" value="1" min="1" disabled style="visibility:hidden"><label class="cb-label" for="bf-mat-9">Cabling, Conduit, Connectors, Cable Support</label></div>
+    </div>
+    <div id="bf-mat-custom"></div>
+    <button class="add-btn" onclick="addCustom('bf-mat-custom')">+ Add custom material</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <div class="grid3">
+      <div class="field"><label class="field-label">Labor hours</label><input type="number" id="bf-lhrs" value="" oninput="calcPrice('bf')"></div>
+      <div class="field"><label class="field-label">Rate ($/hr)</label><input type="number" id="bf-lrate" value="" oninput="calcPrice('bf')"></div>
+      <div class="field"><label class="field-label">Labor discount %</label><input type="number" id="bf-ldisc" value="0" min="0" max="100" oninput="calcPrice('bf')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Materials line items</label>
+        <div class="line-items" id="bf-lineitems"></div>
+        <button type="button" class="add-btn" onclick="addLineItem('bf')">+ Add line item</button>
+        <p class="note-text">Adding line items auto-fills Materials cost below. You can still type a different number into Materials cost directly to override it.</p>
+      </div>
+      <div class="field"><label class="field-label">Materials cost ($)</label><input type="number" id="bf-mcost" value="" oninput="calcPrice('bf')"></div>
+      <div class="field"><label class="field-label">Materials discount %</label><input type="number" id="bf-mdisc" value="0" min="0" max="100" oninput="calcPrice('bf')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Overall discount %</label><input type="number" id="bf-odisc" value="0" min="0" max="100" oninput="calcPrice('bf')"></div>
+      <div class="field"><label class="field-label">Sales tax</label>
+        <select id="bf-tax" onchange="calcPrice('bf')">
+          <option value="yes">Yes — 10.55%</option>
+          <option value="no">No (tax exempt)</option>
+        </select>
+      </div>
+    </div>
+    <table class="price-table" id="bf-price-table"></table>
+  </div>
+
+  <button class="generate-btn" onclick="generate('bf')">Generate proposal text →</button>
+</div>
+
+<!-- ===================== CAMERA SYSTEM ===================== -->
+<div id="type-camera" class="hidden">
+  <p class="page-title">Camera System</p>
+  <p class="page-sub">New installs, upgrades, replacements — with or without monitoring.</p>
+
+  <div class="card">
+    <div class="card-title">Client & site</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Company name</label><input type="text" id="cam-company" placeholder="e.g. Hunters Capital"></div>
+      <div class="field"><label class="field-label">Primary contact</label><input type="text" id="cam-contact" placeholder="e.g. Leo McCabe"></div>
+    </div>
+    <div class="field"><label class="field-label">CC contacts (optional)</label><input type="text" id="cam-cc" placeholder="e.g. Brittany Peterson"></div>
+    <div class="field"><label class="field-label">Property / building name</label><input type="text" id="cam-site" placeholder="e.g. Broadway"></div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Street address</label><input type="text" id="cam-addr" placeholder="e.g. 1641 Nagle Pl"></div>
+      <div class="field"><label class="field-label">City, State ZIP</label><input type="text" id="cam-zip" placeholder="Seattle, WA 98122"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Camera scope</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Total cameras installed</label><input type="number" id="cam-total" value="" min="1" oninput="updateMonitoringRate()"></div>
+      <div class="field">
+        <label class="field-label">Cabling approach</label>
+        <select id="cam-cabling">
+          <option value="reuse">Reuse existing cabling</option>
+          <option value="new">Run all new cabling</option>
+          <option value="mixed">Mix of existing + new cabling</option>
+          <option value="conduit">New cabling + Conduit (WA law)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Recording type</label>
+      <select id="cam-recording">
+        <option value="nvr">NVR with HDD storage</option>
+        <option value="ivmss">IVMSS (Intelligent Video Monitoring Server)</option>
+        <option value="sd">SD card storage (no NVR)</option>
+        <option value="existing">Reuse existing NVR</option>
+      </select>
+    </div>
+    <div class="field" id="cam-nvr-wrap">
+      <label class="field-label">NVR / IVMSS spec</label>
+      <input type="text" id="cam-nvr" placeholder="e.g. 32-Channel NVR w/ 20TB HDD">
+    </div>
+    <div class="field"><label class="field-label">Special notes</label><textarea id="cam-notes" placeholder="e.g. Cameras connect to NVR at adjacent building; tenant suite access required for cabling"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Camera hardware</div>
+    <div class="cb-list">
+      <div class="cb-row"><input type="checkbox" id="cam-hw-0" data-label="8MP Active Deterrence Cameras"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-0">8MP Active Deterrence Cameras</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-1" data-label="8MP 180-Degree Cameras"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-1">8MP 180-Degree Cameras</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-2" data-label="8MP PTZ Camera"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-2">8MP PTZ Camera</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-3" data-label="8MP 2-in-1 PTZ + 180-Degree Camera"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-3">8MP 2-in-1 PTZ + 180-Degree Camera</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-4" data-label="High-Powered PoE Switch"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-4">High-Powered PoE Switch</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-5" data-label="24-Port PoE Switch"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-5">24-Port PoE Switch</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-6" data-label="High-Powered PoE Injectors"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-6">High-Powered PoE Injectors</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-7" data-label="High-Powered PoE Splitters"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-7">High-Powered PoE Splitters</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-8" data-label="Loud Speakers and Audio Amplifiers"><input type="number" class="cb-qty" value="1" min="1" disabled style="visibility:hidden"><label class="cb-label" for="cam-hw-8">Loud Speakers / Audio Amplifiers</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-9" data-label="Router/Firewall"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-9">Router / Firewall</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-10" data-label="Power Conditioner"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-10">Power Conditioner</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-11" data-label="Backup Battery"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-11">Backup Battery</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-12" data-label="512GB SD Cards"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="cam-hw-12">512GB SD Cards (in-camera storage)</label></div>
+      <div class="cb-row"><input type="checkbox" id="cam-hw-13" data-label="55-inch Monitor + TV Wall Bracket"><input type="number" class="cb-qty" value="1" min="1" disabled style="visibility:hidden"><label class="cb-label" for="cam-hw-13">55" Monitor + Wall Bracket (live view)</label></div>
+    </div>
+    <div id="cam-hw-custom"></div>
+    <button class="add-btn" onclick="addCustom('cam-hw-custom')">+ Add custom item</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Monitoring service</div>
+    <div class="toggle-row">
+      <label class="toggle"><input type="checkbox" id="cam-monitoring" onchange="toggleMonitoring()"><span class="toggle-slider"></span></label>
+      <span class="toggle-label">Include 12-hour monitoring service</span>
+    </div>
+    <div id="cam-monitoring-fields" class="hidden">
+      <div class="grid2">
+        <div class="field"><label class="field-label">Cameras monitored</label><input type="number" id="cam-mon-count" value="" min="1" oninput="calcPrice('cam')"></div>
+        <div class="field"><label class="field-label">Rate per camera/month ($)</label><input type="number" id="cam-mon-rate" value="" oninput="calcPrice('cam')"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label class="field-label">Monitoring discount %</label><input type="number" id="cam-mon-disc" value="0" min="0" max="100" oninput="calcPrice('cam')"></div>
+        <div class="field"><label class="field-label">Contract length</label>
+          <select id="cam-mon-term" onchange="calcPrice('cam')">
+            <option value="36">36 months</option>
+            <option value="24">24 months</option>
+            <option value="12">12 months</option>
+          </select>
+        </div>
+      </div>
+      <p class="note-text">Standard rate is $150/camera/month. Bulk discount applies for 20+ cameras (often reduced to $100/camera).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <div class="grid3">
+      <div class="field"><label class="field-label">Labor hours</label><input type="number" id="cam-lhrs" value="" oninput="calcPrice('cam')"></div>
+      <div class="field"><label class="field-label">Rate ($/hr)</label><input type="number" id="cam-lrate" value="" oninput="calcPrice('cam')"></div>
+      <div class="field"><label class="field-label">Labor discount %</label><input type="number" id="cam-ldisc" value="0" min="0" max="100" oninput="calcPrice('cam')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Materials line items</label>
+        <div class="line-items" id="cam-lineitems"></div>
+        <button type="button" class="add-btn" onclick="addLineItem('cam')">+ Add line item</button>
+        <p class="note-text">Adding line items auto-fills Materials cost below. You can still type a different number into Materials cost directly to override it.</p>
+      </div>
+      <div class="field"><label class="field-label">Materials cost ($)</label><input type="number" id="cam-mcost" value="" oninput="calcPrice('cam')"></div>
+      <div class="field"><label class="field-label">Materials discount %</label><input type="number" id="cam-mdisc" value="0" min="0" max="100" oninput="calcPrice('cam')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Overall discount %</label><input type="number" id="cam-odisc" value="0" min="0" max="100" oninput="calcPrice('cam')"></div>
+      <div class="field"><label class="field-label">Sales tax</label>
+        <select id="cam-tax" onchange="calcPrice('cam')">
+          <option value="yes">Yes — 10.55%</option>
+          <option value="no">No (tax exempt)</option>
+        </select>
+      </div>
+    </div>
+    <table class="price-table" id="cam-price-table"></table>
+  </div>
+
+  <button class="generate-btn" onclick="generate('cam')">Generate proposal text →</button>
+</div>
+
+<!-- ===================== DOORKING REPAIR ===================== -->
+<div id="type-doorking" class="hidden">
+  <p class="page-title">Doorking Board / Panel Replacement</p>
+  <p class="page-sub">Single or multiple board replacements, panel upgrades, TCP-IP conversions.</p>
+
+  <div class="card">
+    <div class="card-title">Client & site</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Company name</label><input type="text" id="dk-company" placeholder="e.g. Thrive Communities"></div>
+      <div class="field"><label class="field-label">Primary contact</label><input type="text" id="dk-contact" placeholder="e.g. Kenia Alberdin"></div>
+    </div>
+    <div class="field"><label class="field-label">CC contacts (optional)</label><input type="text" id="dk-cc" placeholder=""></div>
+    <div class="field"><label class="field-label">Property / building name</label><input type="text" id="dk-site" placeholder="e.g. Cooper Apartments"></div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Street address</label><input type="text" id="dk-addr" placeholder="e.g. 13530 Linden Ave N"></div>
+      <div class="field"><label class="field-label">City, State ZIP</label><input type="text" id="dk-zip" placeholder="Seattle, WA 98133"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Scope</div>
+    <div class="field"><label class="field-label">Reason for replacement</label>
+      <select id="dk-reason">
+        <option value="failing">Board is failing / needs replacement</option>
+        <option value="upgrade">System upgrade / modernization</option>
+        <option value="im-server">Moving from IM Server to local setup</option>
+        <option value="tcpip">Adding TCP-IP connectivity</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Special notes</label><textarea id="dk-notes" placeholder="e.g. Moving from IM Server to local setup — eliminates phone lines and monthly Doorking fees"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Hardware being installed</div>
+    <div class="cb-list">
+      <div class="cb-row"><input type="checkbox" id="dk-hw-0" data-label="Doorking 1835 Replacement Board"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dk-hw-0">Doorking 1835 Board</label></div>
+      <div class="cb-row"><input type="checkbox" id="dk-hw-1" data-label="Doorking 1837 Replacement Board"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dk-hw-1">Doorking 1837 Board</label></div>
+      <div class="cb-row"><input type="checkbox" id="dk-hw-2" data-label="Doorking 1838 Board"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dk-hw-2">Doorking 1838 Board</label></div>
+      <div class="cb-row"><input type="checkbox" id="dk-hw-3" data-label="Doorking Memory Chip"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dk-hw-3">Doorking Memory Chip</label></div>
+      <div class="cb-row"><input type="checkbox" id="dk-hw-4" data-label="TCP-IP Converter Kit"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dk-hw-4">TCP-IP Converter Kit</label></div>
+      <div class="cb-row"><input type="checkbox" id="dk-hw-5" data-label="Router/Switch"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dk-hw-5">Router / Switch</label></div>
+      <div class="cb-row"><input type="checkbox" id="dk-hw-6" data-label="Cabling, Connectors, Cable Support"><input type="number" class="cb-qty" value="1" min="1" disabled style="visibility:hidden"><label class="cb-label" for="dk-hw-6">Cabling, Connectors, Cable Support</label></div>
+    </div>
+    <div id="dk-hw-custom"></div>
+    <button class="add-btn" onclick="addCustom('dk-hw-custom')">+ Add custom item</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <div class="grid3">
+      <div class="field"><label class="field-label">Labor hours</label><input type="number" id="dk-lhrs" value="" oninput="calcPrice('dk')"></div>
+      <div class="field"><label class="field-label">Rate ($/hr)</label><input type="number" id="dk-lrate" value="" oninput="calcPrice('dk')"></div>
+      <div class="field"><label class="field-label">Labor discount %</label><input type="number" id="dk-ldisc" value="0" min="0" max="100" oninput="calcPrice('dk')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Materials line items</label>
+        <div class="line-items" id="dk-lineitems"></div>
+        <button type="button" class="add-btn" onclick="addLineItem('dk')">+ Add line item</button>
+        <p class="note-text">Adding line items auto-fills Materials cost below. You can still type a different number into Materials cost directly to override it.</p>
+      </div>
+      <div class="field"><label class="field-label">Materials cost ($)</label><input type="number" id="dk-mcost" value="" oninput="calcPrice('dk')"></div>
+      <div class="field"><label class="field-label">Materials discount %</label><input type="number" id="dk-mdisc" value="0" min="0" max="100" oninput="calcPrice('dk')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Overall discount %</label><input type="number" id="dk-odisc" value="0" min="0" max="100" oninput="calcPrice('dk')"></div>
+      <div class="field"><label class="field-label">Sales tax</label>
+        <select id="dk-tax" onchange="calcPrice('dk')">
+          <option value="yes">Yes — 10.55%</option>
+          <option value="no">No (tax exempt)</option>
+        </select>
+      </div>
+    </div>
+    <table class="price-table" id="dk-price-table"></table>
+  </div>
+
+  <button class="generate-btn" onclick="generate('dk')">Generate proposal text →</button>
+</div>
+
+<!-- ===================== DOOR HARDWARE ===================== -->
+<div id="type-doorhardware" class="hidden">
+  <p class="page-title">Door Hardware</p>
+  <p class="page-sub">Door repairs, astragal installs, maglocks, ADA controllers, door strikes.</p>
+
+  <div class="card">
+    <div class="card-title">Client & site</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Company name</label><input type="text" id="dh-company" placeholder="e.g. American Property Management"></div>
+      <div class="field"><label class="field-label">Primary contact</label><input type="text" id="dh-contact" placeholder="e.g. John Morano"></div>
+    </div>
+    <div class="field"><label class="field-label">CC contacts (optional)</label><input type="text" id="dh-cc" placeholder=""></div>
+    <div class="field"><label class="field-label">Property / building name</label><input type="text" id="dh-site" placeholder="e.g. 700 Broadway"></div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Street address</label><input type="text" id="dh-addr" placeholder="e.g. 700 Broadway East"></div>
+      <div class="field"><label class="field-label">City, State ZIP</label><input type="text" id="dh-zip" placeholder="Seattle, WA 98102"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Scope of work</div>
+    <div class="field"><label class="field-label">Description of work needed</label><textarea id="dh-scope" placeholder="e.g. Repair access control on 3 doors (Main Door, Commercial Garage to Stairs, Outside to Stairs); install 9 full-door astragals on office/lobby/garage doors"></textarea></div>
+    <div class="field"><label class="field-label">Special notes</label><textarea id="dh-notes" placeholder="e.g. Reusing existing cabling; change-order if faulty"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Hardware</div>
+    <div class="cb-list">
+      <div class="cb-row"><input type="checkbox" id="dh-hw-0" data-label="Full-Door Interlocking Astragal"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dh-hw-0">Full-Door Interlocking Astragal</label></div>
+      <div class="cb-row"><input type="checkbox" id="dh-hw-1" data-label="1200LB Maglock"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dh-hw-1">1200LB Maglock</label></div>
+      <div class="cb-row"><input type="checkbox" id="dh-hw-2" data-label="Electrical Door Strike"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dh-hw-2">Electrical Door Strike</label></div>
+      <div class="cb-row"><input type="checkbox" id="dh-hw-3" data-label="Power Supply w/ Backup Battery"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dh-hw-3">Power Supply w/ Backup Battery</label></div>
+      <div class="cb-row"><input type="checkbox" id="dh-hw-4" data-label="Push-to-Exit Button w/ Timer"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dh-hw-4">Push-to-Exit Button w/ Timer</label></div>
+      <div class="cb-row"><input type="checkbox" id="dh-hw-5" data-label="ADA Door Controller"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dh-hw-5">ADA Door Controller</label></div>
+      <div class="cb-row"><input type="checkbox" id="dh-hw-6" data-label="Doorking 1-Button Garage Remote"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="dh-hw-6">Doorking 1-Button Garage Remote</label></div>
+    </div>
+    <div id="dh-hw-custom"></div>
+    <button class="add-btn" onclick="addCustom('dh-hw-custom')">+ Add custom item</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <div class="grid3">
+      <div class="field"><label class="field-label">Labor hours</label><input type="number" id="dh-lhrs" value="" oninput="calcPrice('dh')"></div>
+      <div class="field"><label class="field-label">Rate ($/hr)</label><input type="number" id="dh-lrate" value="" oninput="calcPrice('dh')"></div>
+      <div class="field"><label class="field-label">Labor discount %</label><input type="number" id="dh-ldisc" value="0" min="0" max="100" oninput="calcPrice('dh')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Materials line items</label>
+        <div class="line-items" id="dh-lineitems"></div>
+        <button type="button" class="add-btn" onclick="addLineItem('dh')">+ Add line item</button>
+        <p class="note-text">Adding line items auto-fills Materials cost below. You can still type a different number into Materials cost directly to override it.</p>
+      </div>
+      <div class="field"><label class="field-label">Materials cost ($)</label><input type="number" id="dh-mcost" value="" oninput="calcPrice('dh')"></div>
+      <div class="field"><label class="field-label">Materials discount %</label><input type="number" id="dh-mdisc" value="0" min="0" max="100" oninput="calcPrice('dh')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Overall discount %</label><input type="number" id="dh-odisc" value="0" min="0" max="100" oninput="calcPrice('dh')"></div>
+      <div class="field"><label class="field-label">Sales tax</label>
+        <select id="dh-tax" onchange="calcPrice('dh')">
+          <option value="yes">Yes — 10.55%</option>
+          <option value="no">No (tax exempt)</option>
+        </select>
+      </div>
+    </div>
+    <table class="price-table" id="dh-price-table"></table>
+  </div>
+
+  <button class="generate-btn" onclick="generate('dh')">Generate proposal text →</button>
+</div>
+
+<!-- ===================== WIFI / NETWORKING ===================== -->
+<div id="type-wifi" class="hidden">
+  <p class="page-title">WiFi / Networking</p>
+  <p class="page-sub">Unifi access point replacements, network upgrades, switch installs.</p>
+
+  <div class="card">
+    <div class="card-title">Client & site</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Company name</label><input type="text" id="wifi-company" placeholder="e.g. Eric Cyzner"></div>
+      <div class="field"><label class="field-label">Primary contact</label><input type="text" id="wifi-contact" placeholder="e.g. Alix Vanwagoner"></div>
+    </div>
+    <div class="field"><label class="field-label">CC contacts (optional)</label><input type="text" id="wifi-cc" placeholder=""></div>
+    <div class="field"><label class="field-label">Property / building name</label><input type="text" id="wifi-site" placeholder="e.g. Monarch Apartments"></div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Street address</label><input type="text" id="wifi-addr" placeholder="e.g. 3710 S Angeline Street"></div>
+      <div class="field"><label class="field-label">City, State ZIP</label><input type="text" id="wifi-zip" placeholder="Seattle, WA 98118"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Scope</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Number of APs being installed</label><input type="number" id="wifi-aps" value="" min="1"></div>
+      <div class="field">
+        <label class="field-label">Cabling approach</label>
+        <select id="wifi-cabling">
+          <option value="reuse">Reuse existing cabling</option>
+          <option value="new">Run new cabling</option>
+          <option value="mixed">Mix of existing + new</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Special notes</label><textarea id="wifi-notes" placeholder="e.g. Existing switch being replaced with 24-Port model; customer pays only the difference ($500)"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Hardware</div>
+    <div class="cb-list">
+      <div class="cb-row"><input type="checkbox" id="wifi-hw-0" data-label="Unifi WiFi Access Point"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="wifi-hw-0">Unifi WiFi Access Points</label></div>
+      <div class="cb-row"><input type="checkbox" id="wifi-hw-1" data-label="24-Port PoE Switch"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="wifi-hw-1">24-Port PoE Switch</label></div>
+      <div class="cb-row"><input type="checkbox" id="wifi-hw-2" data-label="Power Conditioner"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="wifi-hw-2">Power Conditioner</label></div>
+      <div class="cb-row"><input type="checkbox" id="wifi-hw-3" data-label="Router/Firewall"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="wifi-hw-3">Router / Firewall</label></div>
+      <div class="cb-row"><input type="checkbox" id="wifi-hw-4" data-label="UPS Backup Battery"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="wifi-hw-4">UPS Backup Battery</label></div>
+    </div>
+    <div id="wifi-hw-custom"></div>
+    <button class="add-btn" onclick="addCustom('wifi-hw-custom')">+ Add custom item</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <div class="grid3">
+      <div class="field"><label class="field-label">Labor hours</label><input type="number" id="wifi-lhrs" value="" oninput="calcPrice('wifi')"></div>
+      <div class="field"><label class="field-label">Rate ($/hr)</label><input type="number" id="wifi-lrate" value="" oninput="calcPrice('wifi')"></div>
+      <div class="field"><label class="field-label">Labor discount %</label><input type="number" id="wifi-ldisc" value="0" min="0" max="100" oninput="calcPrice('wifi')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Materials line items</label>
+        <div class="line-items" id="wifi-lineitems"></div>
+        <button type="button" class="add-btn" onclick="addLineItem('wifi')">+ Add line item</button>
+        <p class="note-text">Adding line items auto-fills Materials cost below. You can still type a different number into Materials cost directly to override it.</p>
+      </div>
+      <div class="field"><label class="field-label">Materials cost ($)</label><input type="number" id="wifi-mcost" value="" oninput="calcPrice('wifi')"></div>
+      <div class="field"><label class="field-label">Materials discount %</label><input type="number" id="wifi-mdisc" value="0" min="0" max="100" oninput="calcPrice('wifi')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Overall discount %</label><input type="number" id="wifi-odisc" value="0" min="0" max="100" oninput="calcPrice('wifi')"></div>
+      <div class="field"><label class="field-label">Sales tax</label>
+        <select id="wifi-tax" onchange="calcPrice('wifi')">
+          <option value="yes">Yes — 10.55%</option>
+          <option value="no">No (tax exempt)</option>
+        </select>
+      </div>
+    </div>
+    <table class="price-table" id="wifi-price-table"></table>
+  </div>
+
+  <button class="generate-btn" onclick="generate('wifi')">Generate proposal text →</button>
+</div>
+
+<!-- ===================== ACCESS EXPANSION ===================== -->
+<div id="type-accessexpansion" class="hidden">
+  <p class="page-title">Access Control Expansion</p>
+  <p class="page-sub">Card reader additions, garage door controllers, non-ButterflyMX expansions.</p>
+
+  <div class="card">
+    <div class="card-title">Client & site</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Company name</label><input type="text" id="ax-company" placeholder="e.g. Abella Condos"></div>
+      <div class="field"><label class="field-label">Primary contact</label><input type="text" id="ax-contact" placeholder=""></div>
+    </div>
+    <div class="field"><label class="field-label">CC contacts (optional)</label><input type="text" id="ax-cc" placeholder=""></div>
+    <div class="field"><label class="field-label">Property / building name</label><input type="text" id="ax-site" placeholder=""></div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Street address</label><input type="text" id="ax-addr" placeholder=""></div>
+      <div class="field"><label class="field-label">City, State ZIP</label><input type="text" id="ax-zip" placeholder="Seattle, WA"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Scope</div>
+    <div class="field">
+      <label class="field-label">Expansion type</label>
+      <select id="ax-type">
+        <option value="cardreader">Card reader addition</option>
+        <option value="garage">Garage door controller</option>
+        <option value="spa">Additional door (spa, gym, etc.)</option>
+        <option value="elevator">Elevator access control</option>
+        <option value="general">General expansion</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Doors being added</label><input type="number" id="ax-doors" value="" min="1"></div>
+    <div class="field">
+      <label class="field-label">Cabling approach</label>
+      <select id="ax-cabling">
+        <option value="new">Run new cabling</option>
+        <option value="panduit">New cabling + Panduit</option>
+        <option value="conduit">New cabling + Conduit (WA law)</option>
+        <option value="reuse">Reuse existing cabling</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Special notes</label><textarea id="ax-notes" placeholder="e.g. Tying into existing Doorking system; new card reader for spa door at Friendly Ridge"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Hardware</div>
+    <div class="cb-list">
+      <div class="cb-row"><input type="checkbox" id="ax-hw-0" data-label="Card Reader"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ax-hw-0">Card Reader</label></div>
+      <div class="cb-row"><input type="checkbox" id="ax-hw-1" data-label="Doorking 1838 Controller"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ax-hw-1">Doorking 1838 Controller</label></div>
+      <div class="cb-row"><input type="checkbox" id="ax-hw-2" data-label="Electrical Door Strike"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ax-hw-2">Electrical Door Strike</label></div>
+      <div class="cb-row"><input type="checkbox" id="ax-hw-3" data-label="Maglock"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ax-hw-3">Maglock</label></div>
+      <div class="cb-row"><input type="checkbox" id="ax-hw-4" data-label="Power Supply"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ax-hw-4">Power Supply</label></div>
+      <div class="cb-row"><input type="checkbox" id="ax-hw-5" data-label="Access Control Cabling, Panduit, Conduit, Connectors, Cable Support"><input type="number" class="cb-qty" value="1" min="1" disabled style="visibility:hidden"><label class="cb-label" for="ax-hw-5">Cabling, Panduit/Conduit, Connectors, Cable Support</label></div>
+    </div>
+    <div id="ax-hw-custom"></div>
+    <button class="add-btn" onclick="addCustom('ax-hw-custom')">+ Add custom item</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <div class="grid3">
+      <div class="field"><label class="field-label">Labor hours</label><input type="number" id="ax-lhrs" value="" oninput="calcPrice('ax')"></div>
+      <div class="field"><label class="field-label">Rate ($/hr)</label><input type="number" id="ax-lrate" value="" oninput="calcPrice('ax')"></div>
+      <div class="field"><label class="field-label">Labor discount %</label><input type="number" id="ax-ldisc" value="0" min="0" max="100" oninput="calcPrice('ax')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Materials line items</label>
+        <div class="line-items" id="ax-lineitems"></div>
+        <button type="button" class="add-btn" onclick="addLineItem('ax')">+ Add line item</button>
+        <p class="note-text">Adding line items auto-fills Materials cost below. You can still type a different number into Materials cost directly to override it.</p>
+      </div>
+      <div class="field"><label class="field-label">Materials cost ($)</label><input type="number" id="ax-mcost" value="" oninput="calcPrice('ax')"></div>
+      <div class="field"><label class="field-label">Materials discount %</label><input type="number" id="ax-mdisc" value="0" min="0" max="100" oninput="calcPrice('ax')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Overall discount %</label><input type="number" id="ax-odisc" value="0" min="0" max="100" oninput="calcPrice('ax')"></div>
+      <div class="field"><label class="field-label">Sales tax</label>
+        <select id="ax-tax" onchange="calcPrice('ax')">
+          <option value="yes">Yes — 10.55%</option>
+          <option value="no">No (tax exempt)</option>
+        </select>
+      </div>
+    </div>
+    <table class="price-table" id="ax-price-table"></table>
+  </div>
+
+  <button class="generate-btn" onclick="generate('ax')">Generate proposal text →</button>
+</div>
+
+<div class="field" id="output-wrap" style="display:none;">
+  <label class="field-label">Generated proposal</label>
+  <textarea id="output-text" readonly style="width:100%; min-height:300px; font-family:monospace; white-space:pre-wrap;"></textarea>
+  <button class="generate-btn" id="copy-btn" onclick="copyOutput()">Copy to Clipboard</button>
+</div>
+
+</main>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCmykezYztfze416cplazhEL6n_cLbktjI",
+  authDomain: "sandru-proposal-generator.firebaseapp.com",
+  projectId: "sandru-proposal-generator",
+  storageBucket: "sandru-proposal-generator.firebasestorage.app",
+  messagingSenderId: "184797831218",
+  appId: "1:184797831218:web:94b9a83b69dc5924f45c2b"
+};
+const ALLOWED_DOMAIN = "sandrutech.com";
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ hd: ALLOWED_DOMAIN });
+
+window._currentIdToken = null;
+
+document.getElementById('signin-btn').addEventListener('click', () => {
+  document.getElementById('signin-error').style.display = 'none';
+  signInWithPopup(auth, provider).catch(err => {
+    const el = document.getElementById('signin-error');
+    el.textContent = 'Sign-in failed: ' + err.message;
+    el.style.display = 'block';
+  });
+});
+
+document.getElementById('signout-btn').addEventListener('click', () => {
+  signOut(auth);
+});
+
+onAuthStateChanged(auth, async (user) => {
+  const gate = document.getElementById('signin-gate');
+  const app = document.getElementById('app-wrap');
+  const errEl = document.getElementById('signin-error');
+
+  if (!user) {
+    window._currentIdToken = null;
+    gate.classList.remove('hidden');
+    app.classList.add('hidden');
+    return;
+  }
+
+  const email = user.email || '';
+  if (!email.toLowerCase().endsWith('@' + ALLOWED_DOMAIN)) {
+    errEl.textContent = 'Access restricted to @' + ALLOWED_DOMAIN + ' accounts. Signed in as ' + email + '.';
+    errEl.style.display = 'block';
+    await signOut(auth);
+    return;
+  }
+
+  window._currentIdToken = await user.getIdToken();
+  gate.classList.add('hidden');
+  app.classList.remove('hidden');
+});
+
+// Refresh the token periodically so long sessions don't expire mid-use
+setInterval(async () => {
+  if (auth.currentUser) {
+    window._currentIdToken = await auth.currentUser.getIdToken();
+  }
+}, 30 * 60 * 1000);
+</script>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CONFIG: point this at your deployed Cloud Function URL.
+// After `firebase deploy`, the CLI prints the Function URL — paste it here.
+// Example: https://us-central1-sandru-proposal-generator.cloudfunctions.net/generateProposal
+const GENERATE_PROPOSAL_URL = '/api/generateProposal';
+// ─────────────────────────────────────────────────────────────
+
+// ── SHARED UTILITIES ──────────────────────────────────────────
+// ── HOUSE STYLE INSTRUCTIONS (prepended to every generated prompt) ──
+const PROMPT_HEADER = `You are writing a proposal scope of work for Sandru Technologies, LLC / Sandru Monitoring — a low-voltage technical services company in Bellevue, WA specializing in access control, camera/video surveillance, networking, and proactive video monitoring for apartment buildings, condos, HOAs, and commercial properties.
+
+Using the job data below, produce a complete proposal in Sandru's house style, matching these established patterns from real client-accepted proposals:
+
+VOICE: Third person, plain technical field-tech language, no marketing fluff. Quantities always written as "five (5)" — word followed by numeral in parentheses. Each scope item starts with a verb: "Install...", "Provide and install...", "Run...", "Remove/uninstall...", "Program and configure...", "Test...", "Terminate, test, and label...".
+
+STRUCTURE:
+1. Title line: "[System/Brand] Installation for [Property Name]" or "[Service] for [Property Name]"
+2. Job Site: property name and address
+3. Scope of Work: ordered list of work items in the voice above. If cabling is being reused, always include: "Sandru Technologies will reuse the existing cabling for this system deployment. If the existing cable is faulty and won't work, or additional cabling is needed, a change-order will be issued with additional charges (pending customer approval)." Close with "Test all hardware and the entire system for functionality to ensure proper operation" and "Customer training on their newly installed [system]."
+4. Notes: caveats and responsibilities NOT owned by Sandru — database/credential setup is done by on-site staff and the hardware vendor's support team (not Sandru) for systems like ButterflyMX, LiftMaster, Brivo; customer must provide on-site internet; vendor-direct hardware must be purchased by the customer and on-site before Sandru arrives; any system training on third-party platforms is provided by that vendor, not Sandru.
+5. Materials: hardware Sandru is providing. If applicable, a separate "Materials to be Provided by the Customer" list for vendor-direct-purchase items (common with ButterflyMX/LiftMaster).
+6. Labor: "Design, Installation, Setup, Programming, Customer Training" at the given hourly rate × hours.
+7. Pricing block: Subtotal, Tax, Total USD. If monitoring is included, show it as a separate "per month (for X months)" line, distinct from the one-time install total.
+8. ALWAYS close with this exact boilerplate, verbatim (substitute the company entity name where bracketed):
+
+"Important Notice About Hardware Pricing
+Due to ongoing fluctuations in global tariffs and supply chain conditions, hardware pricing is subject to change without notice. While we do our best to provide accurate estimates, quoted prices are not guaranteed until confirmed. We kindly ask that you contact us prior to accepting any proposal so we can verify current pricing and availability. This ensures transparency and helps avoid any surprises down the line. We appreciate your understanding and partnership.
+
+These prices are based upon payment being made by Check or Cash
+We accept credit/debit cards for a 4% processing fee. Let us know prior to invoicing if you wish to use a credit/debit card.
+
+Terms and Conditions:
+Payment Terms
+[Company Entity] requires a 50% down payment prior to starting the project and 50% will be invoiced to the customer as progress billing.
+All invoices received shall be paid by the customer within fifteen (15) days of the date of invoice unless otherwise agreed in writing by [Company Entity]. In the event of late payment, [Company Entity] may charge interest on the amount outstanding before and after the agreement. Invoices that are still unpaid after the invoice due date are subject to late fees. [Company Entity] may impose a monthly surcharge equal to 5% of the outstanding amount.
+15 days overdue = 2.5%; 30 days overdue = 5%
+If any amount of the invoice is disputed by the customer, the customer shall inform [Company Entity] of the grounds for such dispute within seven (7) days of acceptance of the terms and shall pay to [Company Entity] the value of the invoice less the disputed amount in accordance with these payment terms.
+Where [Company Entity] requires payment of a deposit, the customer acknowledges that the deposit is not returnable.
+All fees are exclusive of value-added taxes which will be added to invoices where appropriate.
+[Company Entity] reserves the right to increase a quoted fee in the event that the client requests a variation to the work agreed.
+This proposal is valid only for 30 days from the date it is presented.
+
+Notes and Exclusions:
+All painting/patching/drywall work required is to be performed by the owner.
+All work is to be performed during normal hours, 7:00 am to 5:00 pm, Monday through Friday, excluding Holidays.
+Any extra work not included in this Scope of Work, if any, will be performed at an additional cost.
+General Contractor is to provide the valid Reseller Permit. If Reseller Permit is not received, sales tax will be added to the invoice."
+
+If the job includes monitoring service, include a "Why Video Monitoring?" section: monitoring is proactive (not just reactive); cameras have two-way communication so dispatchers can talk directly to visitors/trespassers; an actively-monitored camera deters crime because trespassers know someone is watching; cameras have LED lights and sirens for added deterrence; authorities are dispatched only when necessary (rare, since most people leave after dispatch communication or seeing lights/hearing sirens).
+
+DO NOT invent dollar amounts, tax rates, or hour counts not provided below — use the exact figures given. DO NOT omit the boilerplate sections. DO NOT change the labor rate from what's specified. Keep scope items grounded only in the job data provided — do not add equipment or steps not implied by it.
+
+FORMATTING — this output is pasted directly into Quotient's scope-of-work field. Quotient uses its OWN markup — NOT standard Markdown. Follow these rules exactly, character for character:
+
+BOLD: To make text bold, wrap it in a single asterisk on each side with NO space between the asterisk and the word. Example: *Scope of Work* renders as bold "Scope of Work". Do NOT use double asterisks (**like this**) — double asterisks do NOT bold in Quotient and will appear as literal ** characters. Every section header MUST use this single-asterisk bold format on its own line.
+
+BULLETS: Every scope-of-work line item must start with "* " (one asterisk then a space). Sub-points under a bullet use "** " (two asterisks then a space). Do NOT use numbered lists (1. 2. 3.) anywhere — use bullets throughout. Example of correct format:
+* Install one (1) ButterflyMX 8" Surface Intercom at the main entrance.
+** This intercom will be mounted where the existing Doorking callbox was located.
+* Provide and install one (1) Networking Switch; configure as required.
+
+WHAT TO BOLD — apply single-asterisk bold to exactly these elements and no others:
+
+1. The proposal title line (e.g. *ButterflyMX Installation for Sunset Condos*)
+2. Every major section header, on its own line:
+   *Job Site*
+   *Scope of Work*
+   *Notes*
+   *Materials*
+   *Materials to be Provided by the Customer*
+   *Labor*
+   *Pricing*
+   *Important Notice About Hardware Pricing*
+   *Terms and Conditions*
+   *Payment Terms*
+   *Notes and Exclusions*
+   *Why Video Monitoring?* (only if monitoring is included)
+3. Any sub-section header within Scope of Work when the job has clearly separated zones or phases (e.g. *Building 900*, *Clubhouse Scope of Work*, *Property Entrance Scope of Work*) — bold these exactly like major section headers.
+4. The label "Materials Provided by Sandru Technologies" and "Materials to be Provided by the Customer" when both lists appear.
+5. Nothing else. Do not bold individual bullet points, prices, or body text.
+
+NEVER USE: #, ##, **double asterisks for bold**, numbered lists, | pipe tables, --- dividers, or _ underscores. These are standard Markdown and will appear as raw characters in Quotient.
+
+PRICING/MATERIALS TABLES: List each line as plain text, one item per line. Example:
+Materials (List Price): $5,000.00
+Materials Discount (10%): -$500.00
+Labor: $1,280.00
+Subtotal: $6,280.00
+Tax (10.55%): $662.54
+Total: $6,942.54 USD
+
+Use blank lines between sections.
+
+Now generate the full proposal using this job data:
+
+`;
+
+const NUMS = ['zero','one (1)','two (2)','three (3)','four (4)','five (5)','six (6)','seven (7)','eight (8)','nine (9)','ten (10)','eleven (11)','twelve (12)','thirteen (13)','fourteen (14)','fifteen (15)','sixteen (16)','seventeen (17)','eighteen (18)','nineteen (19)','twenty (20)'];
+function numWord(n) { return (n <= 20 ? NUMS[n] : n + ' (' + n + ')'); }
+function fmt(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function v(id) { return document.getElementById(id); }
+function val(id) { return (v(id) ? v(id).value.trim() : ''); }
+function num(id) { return parseFloat(v(id)?.value) || 0; }
+
+// ── TAB SWITCHING ─────────────────────────────────────────────
+const types = ['butterfly','camera','doorking','doorhardware','wifi','accessexpansion'];
+function switchType(t) {
+  types.forEach(id => {
+    document.getElementById('type-' + id).classList.toggle('hidden', id !== t);
+  });
+  document.querySelectorAll('.type-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', types[i] === t);
+  });
+  calcPrice(prefixFor(t));
+}
+function prefixFor(t) {
+  return {butterfly:'bf',camera:'cam',doorking:'dk',doorhardware:'dh',wifi:'wifi',accessexpansion:'ax'}[t];
+}
+
+// ── CHECKBOX QUANTITY ENABLE/DISABLE + AUTO LINE ITEM ──────────
+document.querySelectorAll('input[type=checkbox]').forEach(cb => {
+  cb.addEventListener('change', function() {
+    const qty = this.parentElement.querySelector('.cb-qty');
+    if (qty && qty.style.visibility !== 'hidden') qty.disabled = !this.checked;
+    if (this.dataset.label) syncCheckboxLineItem(this);
+  });
+});
+document.querySelectorAll('.cb-qty').forEach(qtyInput => {
+  qtyInput.addEventListener('input', function() {
+    const row = this.closest('.cb-row');
+    const cb = row ? row.querySelector('input[type=checkbox]') : null;
+    if (cb && cb.checked) syncCheckboxLineItem(cb);
+  });
+});
+
+// ── ADD CUSTOM ITEM ───────────────────────────────────────────
+function addCustom(containerId) {
+  const d = document.createElement('div');
+  d.className = 'custom-row';
+  d.innerHTML = '<input type="text" placeholder="Custom item" /><button class="rm-btn" onclick="this.parentNode.remove()">×</button>';
+  document.getElementById(containerId).appendChild(d);
+}
+
+// ── MATERIALS LINE ITEMS ──────────────────────────────────────
+function addLineItem(prefix) {
+  const container = document.getElementById(prefix + '-lineitems');
+  const row = document.createElement('div');
+  row.className = 'line-item-row';
+  row.innerHTML =
+    '<input type="text" placeholder="Item name (optional)" />' +
+    '<input type="number" placeholder="0.00" step="0.01" />' +
+    '<button class="rm-btn" type="button" onclick="this.parentNode.remove(); recalcLineItems(\'' + prefix + '\')">×</button>';
+  const priceInput = row.querySelector('input[type=number]');
+  priceInput.addEventListener('input', () => recalcLineItems(prefix));
+  container.appendChild(row);
+  recalcLineItems(prefix);
+}
+
+function recalcLineItems(prefix) {
+  const container = document.getElementById(prefix + '-lineitems');
+  if (!container) return;
+  let sum = 0;
+  container.querySelectorAll('.line-item-row input[type=number]').forEach(inp => {
+    sum += parseFloat(inp.value) || 0;
+  });
+  const mcost = document.getElementById(prefix + '-mcost');
+  if (mcost) mcost.value = sum ? sum.toFixed(2) : '';
+  calcPrice(prefix);
+}
+
+// ── AUTO LINE ITEMS FROM CHECKED HARDWARE/MATERIALS ────────────
+// Checking a hardware/material checkbox (with its quantity) automatically
+// creates a matching row in that tab's pricing line-items list, so the
+// tech only has to type in a price. Unchecking removes the row again.
+// Keyed by checkbox id so each checkbox maps to exactly one row.
+const checkboxLineItemRows = {};
+
+function syncCheckboxLineItem(checkbox) {
+  const prefix = checkbox.id.split('-')[0];
+  const container = document.getElementById(prefix + '-lineitems');
+  if (!container) return;
+
+  if (!checkbox.checked) {
+    removeCheckboxLineItem(checkbox.id);
+    return;
+  }
+
+  const qtyInput = checkbox.parentElement.querySelector('.cb-qty');
+  const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+  const label = checkbox.dataset.label || checkbox.id;
+  const displayName = (qty > 1 ? qty + 'x ' : '') + label;
+
+  let row = checkboxLineItemRows[checkbox.id];
+  if (!row || !row.isConnected) {
+    row = document.createElement('div');
+    row.className = 'line-item-row';
+    row.innerHTML =
+      '<input type="text" placeholder="Item name (optional)" />' +
+      '<input type="number" placeholder="0.00" step="0.01" />' +
+      '<button class="rm-btn" type="button" onclick="removeCheckboxLineItem(\'' + checkbox.id + '\')">×</button>';
+    const priceInput = row.querySelector('input[type=number]');
+    priceInput.addEventListener('input', () => recalcLineItems(prefix));
+    container.appendChild(row);
+    checkboxLineItemRows[checkbox.id] = row;
+  }
+  row.querySelector('input[type=text]').value = displayName;
+  recalcLineItems(prefix);
+}
+
+function removeCheckboxLineItem(checkboxId) {
+  const prefix = checkboxId.split('-')[0];
+  const row = checkboxLineItemRows[checkboxId];
+  if (row && row.isConnected) row.remove();
+  delete checkboxLineItemRows[checkboxId];
+
+  // Keep the checkbox + qty field in sync if the row was removed via its × button
+  const cb = document.getElementById(checkboxId);
+  if (cb && cb.checked) {
+    cb.checked = false;
+    const qty = cb.parentElement.querySelector('.cb-qty');
+    if (qty && qty.style.visibility !== 'hidden') qty.disabled = true;
+  }
+  recalcLineItems(prefix);
+}
+
+function getLineItemsText(prefix) {
+  const container = document.getElementById(prefix + '-lineitems');
+  if (!container) return 'none';
+  const rows = [];
+  container.querySelectorAll('.line-item-row').forEach(row => {
+    const name = row.querySelector('input[type=text]').value.trim();
+    const price = parseFloat(row.querySelector('input[type=number]').value) || 0;
+    if (name || price) rows.push((name || 'Item') + ' ($' + price.toFixed(2) + ')');
+  });
+  return rows.length ? rows.join('; ') : 'none';
+}
+
+// ── PRICE CALC ────────────────────────────────────────────────
+function calcPrice(prefix) {
+  const h = num(prefix+'-lhrs'), r = num(prefix+'-lrate'), ld = num(prefix+'-ldisc');
+  const m = num(prefix+'-mcost'), md = num(prefix+'-mdisc'), od = num(prefix+'-odisc');
+  const taxEl = v(prefix+'-tax'); const tax = taxEl ? taxEl.value === 'yes' : true;
+  const laborGross = h * r;
+  const laborNet = laborGross * (1 - ld/100);
+  const matsNet = m * (1 - md/100);
+  let sub = (laborNet + matsNet) * (1 - od/100);
+
+  // monitoring for camera
+  let monMonthly = 0, monSubtotal = 0, monTax = 0, monTotal = 0, monTerm = 36;
+  if (prefix === 'cam' && v('cam-monitoring')?.checked) {
+    const mc = num('cam-mon-count'), mr = num('cam-mon-rate'), mdisc = num('cam-mon-disc');
+    monTerm = parseInt(v('cam-mon-term')?.value) || 36;
+    monMonthly = mc * mr * (1 - mdisc/100);
+    monSubtotal = monMonthly;
+    monTax = tax ? monMonthly * 0.1055 : 0;
+    monTotal = monSubtotal + monTax;
+  }
+
+  const taxAmt = tax ? sub * 0.1055 : 0;
+  const total = sub + taxAmt;
+
+  let rows = '';
+  rows += `<tr><td>Materials</td><td>${fmt(m)}</td></tr>`;
+  if (md) rows += `<tr class="muted"><td>&nbsp;&nbsp;Materials discount (${md}%)</td><td>−${fmt(m*md/100)}</td></tr>`;
+  rows += `<tr><td>Labor (${h} hrs × ${fmt(r)})</td><td>${fmt(laborGross)}</td></tr>`;
+  if (ld) rows += `<tr class="muted"><td>&nbsp;&nbsp;Labor discount (${ld}%)</td><td>−${fmt(laborGross*ld/100)}</td></tr>`;
+  if (od) rows += `<tr class="muted"><td>&nbsp;&nbsp;Overall discount (${od}%)</td><td>−${fmt((laborNet+matsNet)*od/100)}</td></tr>`;
+  rows += `<tr><td>Subtotal</td><td>${fmt(sub)}</td></tr>`;
+  rows += tax ? `<tr><td>Tax (10.55%)</td><td>${fmt(taxAmt)}</td></tr>` : `<tr class="muted"><td>Tax</td><td>Exempt</td></tr>`;
+  rows += `<tr class="total"><td>Total</td><td>${fmt(total)} USD</td></tr>`;
+  if (monMonthly > 0) {
+    rows += `<tr><td colspan="2" style="padding-top:12px;font-size:12px;color:#9AA0A6;text-transform:uppercase;letter-spacing:0.06em">Monitoring (monthly)</td></tr>`;
+    rows += `<tr><td>Monitoring service</td><td>${fmt(monMonthly)}/mo</td></tr>`;
+    rows += tax ? `<tr><td>Tax (10.55%)</td><td>${fmt(monTax)}/mo</td></tr>` : '';
+    rows += `<tr class="total"><td>Monthly total</td><td>${fmt(monTotal)}/mo × ${monTerm} mo</td></tr>`;
+  }
+  if (v(prefix+'-price-table')) v(prefix+'-price-table').innerHTML = rows;
+
+  window._prices = window._prices || {};
+  window._prices[prefix] = { h, r, ld, laborGross, laborNet, m, md, matsNet, od, sub, taxAmt, total, tax, monMonthly, monTotal, monTerm };
+}
+
+// ── MONITORING TOGGLE ─────────────────────────────────────────
+function toggleMonitoring() {
+  const on = v('cam-monitoring').checked;
+  v('cam-monitoring-fields').classList.toggle('hidden', !on);
+  calcPrice('cam');
+}
+function updateMonitoringRate() {
+  const total = num('cam-total');
+  if (total >= 20 && v('cam-mon-rate')) v('cam-mon-rate').value = 100;
+  else if (v('cam-mon-rate') && v('cam-mon-rate').value == 100) v('cam-mon-rate').value = 150;
+  calcPrice('cam');
+}
+
+// ── GET CHECKED ITEMS ─────────────────────────────────────────
+function getItems(listId, customId) {
+  const items = [];
+  document.querySelectorAll('#'+listId+' .cb-row').forEach(row => {
+    const cb = row.querySelector('input[type=checkbox]');
+    const qty = parseInt(row.querySelector('.cb-qty')?.value) || 1;
+    if (cb && cb.checked) items.push({ label: cb.dataset.label, qty });
+  });
+  document.querySelectorAll('#'+customId+' input[type=text]').forEach(inp => {
+    if (inp.value.trim()) items.push({ label: inp.value.trim(), qty: 1 });
+  });
+  return items;
+}
+
+// ── GENERATE ─────────────────────────────────────────────────
+function generate(prefix) {
+  const p = (window._prices || {})[prefix] || {};
+
+  let data = {};
+  let prompt = '';
+
+  if (prefix === 'bf') {
+    const sysRaw = val('bf-existing');
+    const existingSys = sysRaw === 'custom' ? val('bf-custom-sys') : sysRaw;
+    const cabling = val('bf-cabling');
+    const cabledDesc = {reuse:'reuse existing cabling (no new cabling included)',new:'run new cabling',panduit:'run new cabling with Panduit raceway',conduit:'run new cabling with Conduit per WA State Law'}[cabling];
+    const bmx = getItems('bf-bmx-list','bf-bmx-custom');
+    const mats = getItems('bf-mat-list','bf-mat-custom');
+
+    prompt = PROMPT_HEADER + `GENERATE_PROPOSAL|TYPE:ButterflyMX
+CLIENT:${val('bf-company')}|CONTACT:${val('bf-contact')}|CC:${val('bf-cc')||'none'}
+SITE:${val('bf-site')}|ADDRESS:${val('bf-addr')}, ${val('bf-zip')}
+JOB TYPE:${val('bf-jobtype')}|DOORS:${val('bf-doors')}|EXISTING SYSTEM:${existingSys}
+CABLING:${cabledDesc}
+SPECIAL NOTES:${val('bf-notes')||'none'}
+BMX HARDWARE (customer-provided):${bmx.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
+SANDRU MATERIALS:${mats.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
+MATERIALS LINE ITEMS:${getLineItemsText('bf')}
+MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
+LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
+OVERALL DISCOUNT:${p.od||0}%
+SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
+TOTAL:${fmt(p.total||0)} USD`;
+
+  } else if (prefix === 'cam') {
+    const monOn = v('cam-monitoring')?.checked;
+    const hwItems = [];
+    document.querySelectorAll('[id^="cam-hw-"]').forEach(cb => {
+      if (cb.type === 'checkbox' && cb.checked) {
+        const qty = parseInt(cb.parentElement.querySelector('.cb-qty')?.value)||1;
+        hwItems.push(numWord(qty)+' '+cb.dataset.label);
+      }
+    });
+    document.querySelectorAll('#cam-hw-custom input[type=text]').forEach(inp => { if(inp.value.trim()) hwItems.push(inp.value.trim()); });
+
+    prompt = PROMPT_HEADER + `GENERATE_PROPOSAL|TYPE:Camera System
+CLIENT:${val('cam-company')}|CONTACT:${val('cam-contact')}|CC:${val('cam-cc')||'none'}
+SITE:${val('cam-site')}|ADDRESS:${val('cam-addr')}, ${val('cam-zip')}
+TOTAL CAMERAS:${val('cam-total')}|CABLING:${val('cam-cabling')}
+RECORDING:${val('cam-recording')}|NVR SPEC:${val('cam-nvr')||'n/a'}
+HARDWARE:${hwItems.join('; ')||'none'}
+MONITORING:${monOn?`YES — ${val('cam-mon-count')} cameras at ${fmt(num('cam-mon-rate'))}/camera/mo, ${val('cam-mon-disc')||0}% disc, ${val('cam-mon-term')} months`:'No monitoring'}
+SPECIAL NOTES:${val('cam-notes')||'none'}
+MATERIALS LINE ITEMS:${getLineItemsText('cam')}
+MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
+LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
+OVERALL DISCOUNT:${p.od||0}%
+SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
+TOTAL:${fmt(p.total||0)} USD
+${monOn?`MONTHLY MONITORING:${fmt(p.monMonthly||0)}/mo + tax for ${val('cam-mon-term')} months`:''}`;
+
+  } else if (prefix === 'dk') {
+    const hwItems = [];
+    document.querySelectorAll('[id^="dk-hw-"]').forEach(cb => {
+      if (cb.type === 'checkbox' && cb.checked) {
+        const qty = parseInt(cb.parentElement.querySelector('.cb-qty')?.value)||1;
+        hwItems.push(numWord(qty)+' '+cb.dataset.label);
+      }
+    });
+    document.querySelectorAll('#dk-hw-custom input[type=text]').forEach(inp => { if(inp.value.trim()) hwItems.push(inp.value.trim()); });
+
+    prompt = PROMPT_HEADER + `GENERATE_PROPOSAL|TYPE:Doorking Board Replacement
+CLIENT:${val('dk-company')}|CONTACT:${val('dk-contact')}|CC:${val('dk-cc')||'none'}
+SITE:${val('dk-site')}|ADDRESS:${val('dk-addr')}, ${val('dk-zip')}
+REASON:${val('dk-reason')}
+HARDWARE:${hwItems.join('; ')||'none'}
+SPECIAL NOTES:${val('dk-notes')||'none'}
+MATERIALS LINE ITEMS:${getLineItemsText('dk')}
+MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
+LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
+SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
+TOTAL:${fmt(p.total||0)} USD`;
+
+  } else if (prefix === 'dh') {
+    const hwItems = [];
+    document.querySelectorAll('[id^="dh-hw-"]').forEach(cb => {
+      if (cb.type === 'checkbox' && cb.checked) {
+        const qty = parseInt(cb.parentElement.querySelector('.cb-qty')?.value)||1;
+        hwItems.push(numWord(qty)+' '+cb.dataset.label);
+      }
+    });
+    document.querySelectorAll('#dh-hw-custom input[type=text]').forEach(inp => { if(inp.value.trim()) hwItems.push(inp.value.trim()); });
+
+    prompt = PROMPT_HEADER + `GENERATE_PROPOSAL|TYPE:Door Hardware
+CLIENT:${val('dh-company')}|CONTACT:${val('dh-contact')}|CC:${val('dh-cc')||'none'}
+SITE:${val('dh-site')}|ADDRESS:${val('dh-addr')}, ${val('dh-zip')}
+SCOPE:${val('dh-scope')}
+HARDWARE:${hwItems.join('; ')||'none'}
+SPECIAL NOTES:${val('dh-notes')||'none'}
+MATERIALS LINE ITEMS:${getLineItemsText('dh')}
+MATERIALS:${fmt(p.m||0)}|LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}
+SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
+TOTAL:${fmt(p.total||0)} USD`;
+
+  } else if (prefix === 'wifi') {
+    const hwItems = [];
+    document.querySelectorAll('[id^="wifi-hw-"]').forEach(cb => {
+      if (cb.type === 'checkbox' && cb.checked) {
+        const qty = parseInt(cb.parentElement.querySelector('.cb-qty')?.value)||1;
+        hwItems.push(numWord(qty)+' '+cb.dataset.label);
+      }
+    });
+    document.querySelectorAll('#wifi-hw-custom input[type=text]').forEach(inp => { if(inp.value.trim()) hwItems.push(inp.value.trim()); });
+
+    prompt = PROMPT_HEADER + `GENERATE_PROPOSAL|TYPE:WiFi Access Point Installation
+CLIENT:${val('wifi-company')}|CONTACT:${val('wifi-contact')}|CC:${val('wifi-cc')||'none'}
+SITE:${val('wifi-site')}|ADDRESS:${val('wifi-addr')}, ${val('wifi-zip')}
+APs:${val('wifi-aps')}|CABLING:${val('wifi-cabling')}
+HARDWARE:${hwItems.join('; ')||'none'}
+SPECIAL NOTES:${val('wifi-notes')||'none'}
+MATERIALS LINE ITEMS:${getLineItemsText('wifi')}
+MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
+LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
+SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
+TOTAL:${fmt(p.total||0)} USD`;
+
+  } else if (prefix === 'ax') {
+    const hwItems = [];
+    document.querySelectorAll('[id^="ax-hw-"]').forEach(cb => {
+      if (cb.type === 'checkbox' && cb.checked) {
+        const qty = parseInt(cb.parentElement.querySelector('.cb-qty')?.value)||1;
+        hwItems.push(numWord(qty)+' '+cb.dataset.label);
+      }
+    });
+    document.querySelectorAll('#ax-hw-custom input[type=text]').forEach(inp => { if(inp.value.trim()) hwItems.push(inp.value.trim()); });
+
+    prompt = PROMPT_HEADER + `GENERATE_PROPOSAL|TYPE:Access Control Expansion
+CLIENT:${val('ax-company')}|CONTACT:${val('ax-contact')}|CC:${val('ax-cc')||'none'}
+SITE:${val('ax-site')}|ADDRESS:${val('ax-addr')}, ${val('ax-zip')}
+EXPANSION TYPE:${val('ax-type')}|DOORS ADDED:${val('ax-doors')}|CABLING:${val('ax-cabling')}
+HARDWARE:${hwItems.join('; ')||'none'}
+SPECIAL NOTES:${val('ax-notes')||'none'}
+MATERIALS LINE ITEMS:${getLineItemsText('ax')}
+MATERIALS:${fmt(p.m||0)}|LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}
+SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
+TOTAL:${fmt(p.total||0)} USD`;
+  }
+
+  const outWrap = v('output-wrap');
+  const outText = v('output-text');
+  const btn = document.querySelector(`button.generate-btn[onclick="generate('${prefix}')"]`);
+
+  outText.value = 'Generating proposal…';
+  outWrap.style.display = '';
+  outText.scrollIntoView({behavior:'smooth', block:'start'});
+  if (btn) { btn.disabled = true; btn.dataset.origText = btn.textContent; btn.textContent = 'Generating…'; }
+
+  if (!window._currentIdToken) {
+    outText.value = 'Error: not signed in. Please refresh and sign in again.';
+    outWrap.style.display = '';
+    return;
+  }
+
+  fetch(GENERATE_PROPOSAL_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + window._currentIdToken
+    },
+    body: JSON.stringify({ prompt })
+  })
+    .then(res => {
+      if (!res.ok) {
+        return res.json().then(err => { throw new Error(err.error || ('HTTP ' + res.status)); });
+      }
+      return res.json();
+    })
+    .then(data => {
+      outText.value = data.text;
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.origText; }
+    })
+    .catch(err => {
+      outText.value = 'Error generating proposal: ' + (err && err.message ? err.message : err);
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.origText; }
+    });
+}
+
+function copyOutput() {
+  const outText = v('output-text');
+  outText.select();
+  navigator.clipboard.writeText(outText.value).then(() => {
+    const btn = v('copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
+}
+
+// ── INIT ALL PRICE TABLES ─────────────────────────────────────
+['bf','cam','dk','dh','wifi','ax'].forEach(calcPrice);
+</script>
+</body>
+</html>
