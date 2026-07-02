@@ -848,7 +848,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmykezYztfze416cplazhEL6n_cLbktjI",
@@ -867,14 +867,27 @@ provider.setCustomParameters({ hd: ALLOWED_DOMAIN });
 
 window._currentIdToken = null;
 
+function showSigninError(err) {
+  const el = document.getElementById('signin-error');
+  el.textContent = 'Sign-in failed: ' + err.message;
+  el.style.display = 'block';
+}
+
 document.getElementById('signin-btn').addEventListener('click', () => {
   document.getElementById('signin-error').style.display = 'none';
   signInWithPopup(auth, provider).catch(err => {
-    const el = document.getElementById('signin-error');
-    el.textContent = 'Sign-in failed: ' + err.message;
-    el.style.display = 'block';
+    // Embedded browsers (e.g. app previews) block popups — fall back to
+    // navigating this page to Google sign-in and back.
+    if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
+      signInWithRedirect(auth, provider).catch(showSigninError);
+      return;
+    }
+    showSigninError(err);
   });
 });
+
+// Completes the redirect flow after returning from Google sign-in
+getRedirectResult(auth).catch(showSigninError);
 
 document.getElementById('signout-btn').addEventListener('click', () => {
   signOut(auth);
@@ -1092,6 +1105,10 @@ function recalcLineItems(prefix) {
 const checkboxLineItemRows = {};
 
 function syncCheckboxLineItem(checkbox) {
+  // Customer-provided ButterflyMX hardware is purchased vendor-direct by the
+  // customer, so it never enters Sandru's pricing / materials totals.
+  if (checkbox.closest('#bf-bmx-list')) return;
+
   const prefix = checkbox.id.split('-')[0];
   const container = document.getElementById(prefix + '-lineitems');
   if (!container) return;
