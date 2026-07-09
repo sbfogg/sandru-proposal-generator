@@ -322,7 +322,14 @@
   </div>
 
   <div class="card">
-    <div class="card-title">ButterflyMX hardware — customer-provided</div>
+    <div class="card-title">ButterflyMX hardware</div>
+    <div class="field">
+      <label class="field-label">ButterflyMX hardware supplied by</label>
+      <select id="bf-bmx-supply" onchange="onBmxSupplyChange()">
+        <option value="customer">Customer — vendor-direct from ButterflyMX (not in materials total)</option>
+        <option value="sandru">Sandru — we sell it (included in materials total)</option>
+      </select>
+    </div>
     <div class="cb-list" id="bf-bmx-list">
       <div class="cb-row"><input type="checkbox" id="bf-bmx-0" data-label='ButterflyMX 8" Surface Intercom'><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-0">8" Surface Intercom</label></div>
       <div class="cb-row"><input type="checkbox" id="bf-bmx-1" data-label='ButterflyMX 12" Surface Intercom'><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="bf-bmx-1">12" Surface Intercom</label></div>
@@ -1005,6 +1012,8 @@ BULLETS: Every scope-of-work line item must start with "* " (one asterisk then a
 ** If the existing cable is faulty and won't work, or additional cabling is needed, a change-order will be issued with additional charges (pending customer approval)
 *** No new cabling is included in this proposal
 
+LINE SPACING: Do NOT put a blank line between bullet lines. Every bullet and its ** / *** sub-points appear on directly consecutive lines with no empty line between them. Insert a single blank line ONLY before a bold section header (before *Notes*, *Materials*, *Labor*, *Important Notice About Hardware Pricing*, *Terms and Conditions*, *Payment Terms*, *Notes and Exclusions*) and after the title and after the Job Site block. In particular, the entire Scope of Work is one unbroken block of bullets — the first blank line after Scope of Work comes immediately before the *Notes* header.
+
 WHAT TO BOLD — apply single-asterisk bold to exactly these elements and no others:
 
 1. The proposal title line (e.g. *ButterflyMX Access Control Installation for Sunset Condos*)
@@ -1117,9 +1126,11 @@ function recalcLineItems(prefix) {
 const checkboxLineItemRows = {};
 
 function syncCheckboxLineItem(checkbox) {
-  // Customer-provided ButterflyMX hardware is purchased vendor-direct by the
-  // customer, so it never enters Sandru's pricing / materials totals.
-  if (checkbox.closest('#bf-bmx-list')) return;
+  // ButterflyMX hardware only enters Sandru's pricing / materials total when
+  // Sandru is selling it. When the customer buys it vendor-direct, it is still
+  // listed in the proposal but never added to the materials total.
+  if (checkbox.closest('#bf-bmx-list') &&
+      (document.getElementById('bf-bmx-supply')?.value || 'customer') === 'customer') return;
 
   const prefix = checkbox.id.split('-')[0];
   const container = document.getElementById(prefix + '-lineitems');
@@ -1166,6 +1177,25 @@ function removeCheckboxLineItem(checkboxId) {
     if (qty && qty.style.visibility !== 'hidden') qty.disabled = true;
   }
   recalcLineItems(prefix);
+}
+
+// When the ButterflyMX supply source changes, re-sync every already-checked BMX
+// item: if Sandru now sells it, give it a priced line-item row (so its cost is
+// in Total Materials); if the customer provides it, drop that pricing row but
+// keep the item checked so it still appears in the scope/materials list.
+function onBmxSupplyChange() {
+  const supply = document.getElementById('bf-bmx-supply')?.value || 'customer';
+  document.querySelectorAll('#bf-bmx-list input[type=checkbox]').forEach(cb => {
+    if (!cb.checked) return;
+    if (supply === 'sandru') {
+      syncCheckboxLineItem(cb);
+    } else {
+      const row = checkboxLineItemRows[cb.id];
+      if (row && row.isConnected) row.remove();
+      delete checkboxLineItemRows[cb.id];
+    }
+  });
+  recalcLineItems('bf');
 }
 
 function getLineItemsText(prefix) {
@@ -1264,6 +1294,7 @@ function generate(prefix) {
     const existingSys = sysRaw === 'custom' ? val('bf-custom-sys') : sysRaw;
     const cabling = val('bf-cabling');
     const cabledDesc = {reuse:'reuse existing cabling (no new cabling included)',new:'run new cabling',panduit:'run new cabling with Panduit raceway',conduit:'run new cabling with Conduit per WA State Law'}[cabling];
+    const bmxSupply = val('bf-bmx-supply') || 'customer';
     const bmx = getItems('bf-bmx-list','bf-bmx-custom');
     const mats = getItems('bf-mat-list','bf-mat-custom');
 
@@ -1273,7 +1304,7 @@ SITE:${val('bf-site')}|ADDRESS:${val('bf-addr')}, ${val('bf-zip')}
 JOB TYPE:${val('bf-jobtype')}|DOORS:${val('bf-doors')}|EXISTING SYSTEM:${existingSys}
 CABLING:${cabledDesc}
 SPECIAL NOTES:${val('bf-notes')||'none'}
-BMX HARDWARE (customer-provided):${bmx.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
+BUTTERFLYMX HARDWARE (${bmxSupply==='sandru'?'Sandru-supplied, cost included in Total Materials':'customer-provided vendor-direct, NOT in Total Materials'}):${bmx.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
 SANDRU MATERIALS:${mats.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
 TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
 TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
