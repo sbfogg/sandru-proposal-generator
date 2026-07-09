@@ -1,6 +1,6 @@
 {
   "projects": {
-    "idontknow": "sandru-proposal-generator"
+    "default": "sandru-proposal-generator"
   },
   "targets": {},
   "etags": {}
