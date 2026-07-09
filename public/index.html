@@ -943,13 +943,27 @@ Using the job data below, produce a complete proposal in Sandru's house style, m
 VOICE: Third person, plain technical field-tech language, no marketing fluff. Quantities always written as "five (5)" — word followed by numeral in parentheses. Each scope item starts with a verb: "Install...", "Provide and install...", "Run...", "Remove/uninstall...", "Program and configure...", "Test...", "Terminate, test, and label...".
 
 STRUCTURE:
-1. Title line: "[System/Brand] Installation for [Property Name]" or "[Service] for [Property Name]"
-2. Job Site: property name and address
-3. Scope of Work: ordered list of work items in the voice above. If cabling is being reused, always include: "Sandru Technologies will reuse the existing cabling for this system deployment. If the existing cable is faulty and won't work, or additional cabling is needed, a change-order will be issued with additional charges (pending customer approval)." Close with "Test all hardware and the entire system for functionality to ensure proper operation" and "Customer training on their newly installed [system]."
-4. Notes: caveats and responsibilities NOT owned by Sandru — database/credential setup is done by on-site staff and the hardware vendor's support team (not Sandru) for systems like ButterflyMX, LiftMaster, Brivo; customer must provide on-site internet; vendor-direct hardware must be purchased by the customer and on-site before Sandru arrives; any system training on third-party platforms is provided by that vendor, not Sandru.
-5. Materials: hardware Sandru is providing. If applicable, a separate "Materials to be Provided by the Customer" list for vendor-direct-purchase items (common with ButterflyMX/LiftMaster).
-6. Labor: "Design, Installation, Setup, Programming, Customer Training" at the given hourly rate × hours.
-7. Pricing block: Subtotal, Tax, Total USD. If monitoring is included, show it as a separate "per month (for X months)" line, distinct from the one-time install total.
+1. Title line: "[System/Brand] Installation for [Property Name]" or "[Service] for [Property Name]". For access-control systems (ButterflyMX, Doorking, access control expansion), phrase it as "[Brand] Access Control Installation for [Property Name]".
+2. Job Site: property name on its own line, then the street address on the next line, then "City, ST ZIP" on the next line. Abbreviate compass directionals in the street (North → N, South → S, East → E, West → W).
+3. Scope of Work: a bulleted list of work items in the voice above.
+   - OPEN with a one-line summary bullet naming the system being installed and the property, e.g. "* Install a new ButterflyMX access control system at [Property Name]". Directly beneath it, add a nested sub-bullet stating how many total doors/openings/zones the system controls and naming them when known from the job data, e.g. "** This system will control one (1) total door; the Main Entrance".
+   - Then the work items in this order: remove/uninstall the existing hardware being replaced → provide, install, and program the main device (intercom, controller, or board) → provide and install each supporting network device → test. List the main system device BEFORE the supporting network equipment.
+   - Program the main device "in conjunction with [Vendor] Support" (e.g. "Program and configure this newly installed Butterfly intercom in conjunction with Butterfly Support").
+   - Phrase each supporting-equipment item as: "Provide and install [qty] [device] for this system deployment; configure as required." Use "Networking Switch" (never "Networking Switch/Firewall"). Give the UPS Backup Battery a nested sub-bullet: "** This Backup Battery will provide continued power to the system in the event of a power interruption."
+   - If cabling is being reused, include it as a bolded lead bullet with nested detail, exactly:
+     * *Sandru Technologies will reuse the existing cabling for this system deployment*
+     ** If the existing cable is faulty and won't work, or additional cabling is needed, a change-order will be issued with additional charges (pending customer approval)
+     *** No new cabling is included in this proposal
+   - Close with "* Test all hardware and the entire system for functionality to ensure proper operation." Do NOT put a customer-training line in Scope — training belongs only in the Labor list.
+4. Notes: caveats and responsibilities NOT owned by Sandru. Write each as a bolded lead bullet (the lead sentence wrapped in single asterisks) with UNbolded nested detail beneath it. Cover, when applicable:
+   - Cabling reuse recap (only if cabling is reused): "* *As stated above, Sandru Technologies will be reusing the existing cabling for this system installation*", with the same change-order sub-bullet and "*** No new cabling is included in this proposal".
+   - Database readiness: "* *Before any installation begins, the database for this new system needs to be built and ready for configuration*" / "** This is not Sandru's responsibility; this is done by on-site staff and [Vendor] Support directly".
+   - Credentials: "* *Before any installation begins, the new credentials (ex: windshield tags, fobs, etc.) will need to be assigned and distributed to tenants and staff on site*" / "** This is not Sandru's responsibility; this is to be done by on-site staff and [Vendor] Support directly".
+   - Internet: "* *At the time of installation, the customer must provide hard-wired internet on-site for this [Vendor] system/installation*".
+   - Vendor training: "* *Any system training is to be provided by [Vendor] and their support team*".
+5. Materials: a SINGLE bulleted list of every hardware/material item with its quantity and NO prices — do not split into Sandru-provided vs customer-provided, and do not show per-item costs. Add "* Other miscellaneous materials" as the final bullet. Then, on its own line directly below the list, show the combined materials total exactly as given in the job data (the TOTAL MATERIALS figure), labeled: "Total Materials: $X.XX".
+6. Labor: a bulleted list of the labor categories only — "* Design", "* Installation", "* Setup", "* Programming", "* Customer Training" — with NO hours and NO hourly rate. Then, on its own line directly below, show the labor lump sum exactly as given (the TOTAL LABOR figure), labeled: "Total Labor: $Y.YY".
+7. Do NOT output a Subtotal / Tax / grand Total pricing block — Quotient computes those from the totals entered into it separately. The only dollar figures in the proposal are the "Total Materials" and "Total Labor" lines above. EXCEPTION: if monitoring service is included, still show the monitoring monthly amount and term as a separate recurring line.
 8. ALWAYS close with this exact boilerplate, verbatim (substitute the company entity name where bracketed):
 
 "Important Notice About Hardware Pricing
@@ -977,46 +991,44 @@ General Contractor is to provide the valid Reseller Permit. If Reseller Permit i
 
 If the job includes monitoring service, include a "Why Video Monitoring?" section: monitoring is proactive (not just reactive); cameras have two-way communication so dispatchers can talk directly to visitors/trespassers; an actively-monitored camera deters crime because trespassers know someone is watching; cameras have LED lights and sirens for added deterrence; authorities are dispatched only when necessary (rare, since most people leave after dispatch communication or seeing lights/hearing sirens).
 
-DO NOT invent dollar amounts, tax rates, or hour counts not provided below — use the exact figures given. DO NOT omit the boilerplate sections. DO NOT change the labor rate from what's specified. Keep scope items grounded only in the job data provided — do not add equipment or steps not implied by it.
+DO NOT invent dollar amounts or tax rates not provided below — use the exact figures given. DO NOT omit the boilerplate sections. DO NOT change any dollar figure from what's specified. Keep scope items grounded only in the job data provided — do not add equipment or steps not implied by it.
 
 FORMATTING — this output is pasted directly into Quotient's scope-of-work field. Quotient uses its OWN markup — NOT standard Markdown. Follow these rules exactly, character for character:
 
 BOLD: To make text bold, wrap it in a single asterisk on each side with NO space between the asterisk and the word. Example: *Scope of Work* renders as bold "Scope of Work". Do NOT use double asterisks (**like this**) — double asterisks do NOT bold in Quotient and will appear as literal ** characters. Every section header MUST use this single-asterisk bold format on its own line.
 
-BULLETS: Every scope-of-work line item must start with "* " (one asterisk then a space). Sub-points under a bullet use "** " (two asterisks then a space). Do NOT use numbered lists (1. 2. 3.) anywhere — use bullets throughout. Example of correct format:
-* Install one (1) ButterflyMX 8" Surface Intercom at the main entrance.
-** This intercom will be mounted where the existing Doorking callbox was located.
-* Provide and install one (1) Networking Switch; configure as required.
+BULLETS: Every scope-of-work line item must start with "* " (one asterisk then a space). Sub-points under a bullet use "** " (two asterisks then a space). Sub-points under a sub-point use "*** " (three asterisks then a space). Do NOT use numbered lists (1. 2. 3.) anywhere — use bullets throughout. Example of correct format:
+* Provide and install one (1) ButterflyMX 12" Recessed Intercom with Back Box at the Main Entrance
+** This intercom is to be recessed-mounted where the existing Doorking callbox was located
+* Provide and install one (1) Networking Switch for this system deployment; configure as required
+* *Sandru Technologies will reuse the existing cabling for this system deployment*
+** If the existing cable is faulty and won't work, or additional cabling is needed, a change-order will be issued with additional charges (pending customer approval)
+*** No new cabling is included in this proposal
 
 WHAT TO BOLD — apply single-asterisk bold to exactly these elements and no others:
 
-1. The proposal title line (e.g. *ButterflyMX Installation for Sunset Condos*)
+1. The proposal title line (e.g. *ButterflyMX Access Control Installation for Sunset Condos*)
 2. Every major section header, on its own line:
    *Job Site*
    *Scope of Work*
    *Notes*
    *Materials*
-   *Materials to be Provided by the Customer*
    *Labor*
-   *Pricing*
    *Important Notice About Hardware Pricing*
    *Terms and Conditions*
    *Payment Terms*
    *Notes and Exclusions*
    *Why Video Monitoring?* (only if monitoring is included)
 3. Any sub-section header within Scope of Work when the job has clearly separated zones or phases (e.g. *Building 900*, *Clubhouse Scope of Work*, *Property Entrance Scope of Work*) — bold these exactly like major section headers.
-4. The label "Materials Provided by Sandru Technologies" and "Materials to be Provided by the Customer" when both lists appear.
-5. Nothing else. Do not bold individual bullet points, prices, or body text.
+4. The lead line of each Notes caveat bullet, and the cabling-reuse lead bullet in Scope of Work, are wrapped in single-asterisk bold (e.g. "* *Before any installation begins, the database for this new system needs to be built and ready for configuration*"). Their nested ** and *** detail lines are left UNbolded.
+5. Nothing else. Do not bold prices, body text, or ordinary scope bullets beyond those named above.
 
 NEVER USE: #, ##, **double asterisks for bold**, numbered lists, | pipe tables, --- dividers, or _ underscores. These are standard Markdown and will appear as raw characters in Quotient.
 
-PRICING/MATERIALS TABLES: List each line as plain text, one item per line. Example:
-Materials (List Price): $5,000.00
-Materials Discount (10%): -$500.00
-Labor: $1,280.00
-Subtotal: $6,280.00
-Tax (10.55%): $662.54
-Total: $6,942.54 USD
+TOTALS: The proposal shows only two dollar figures, each as plain text on its own line directly beneath its section's bulleted list — nothing else. Example:
+Total Materials: $5,000.00
+Total Labor: $1,280.00
+Do NOT output a Subtotal, Tax, or grand Total line — Quotient calculates those from the totals entered into it separately.
 
 Use blank lines between sections.
 
@@ -1263,12 +1275,8 @@ CABLING:${cabledDesc}
 SPECIAL NOTES:${val('bf-notes')||'none'}
 BMX HARDWARE (customer-provided):${bmx.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
 SANDRU MATERIALS:${mats.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
-MATERIALS LINE ITEMS:${getLineItemsText('bf')}
-MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
-LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
-OVERALL DISCOUNT:${p.od||0}%
-SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
-TOTAL:${fmt(p.total||0)} USD`;
+TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
+TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
 
   } else if (prefix === 'cam') {
     const monOn = v('cam-monitoring')?.checked;
@@ -1289,12 +1297,8 @@ RECORDING:${val('cam-recording')}|NVR SPEC:${val('cam-nvr')||'n/a'}
 HARDWARE:${hwItems.join('; ')||'none'}
 MONITORING:${monOn?`YES — ${val('cam-mon-count')} cameras at ${fmt(num('cam-mon-rate'))}/camera/mo, ${val('cam-mon-disc')||0}% disc, ${val('cam-mon-term')} months`:'No monitoring'}
 SPECIAL NOTES:${val('cam-notes')||'none'}
-MATERIALS LINE ITEMS:${getLineItemsText('cam')}
-MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
-LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
-OVERALL DISCOUNT:${p.od||0}%
-SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
-TOTAL:${fmt(p.total||0)} USD
+TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
+TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}
 ${monOn?`MONTHLY MONITORING:${fmt(p.monMonthly||0)}/mo + tax for ${val('cam-mon-term')} months`:''}`;
 
   } else if (prefix === 'dk') {
@@ -1313,11 +1317,8 @@ SITE:${val('dk-site')}|ADDRESS:${val('dk-addr')}, ${val('dk-zip')}
 REASON:${val('dk-reason')}
 HARDWARE:${hwItems.join('; ')||'none'}
 SPECIAL NOTES:${val('dk-notes')||'none'}
-MATERIALS LINE ITEMS:${getLineItemsText('dk')}
-MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
-LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
-SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
-TOTAL:${fmt(p.total||0)} USD`;
+TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
+TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
 
   } else if (prefix === 'dh') {
     const hwItems = [];
@@ -1335,10 +1336,8 @@ SITE:${val('dh-site')}|ADDRESS:${val('dh-addr')}, ${val('dh-zip')}
 SCOPE:${val('dh-scope')}
 HARDWARE:${hwItems.join('; ')||'none'}
 SPECIAL NOTES:${val('dh-notes')||'none'}
-MATERIALS LINE ITEMS:${getLineItemsText('dh')}
-MATERIALS:${fmt(p.m||0)}|LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}
-SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
-TOTAL:${fmt(p.total||0)} USD`;
+TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
+TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
 
   } else if (prefix === 'wifi') {
     const hwItems = [];
@@ -1356,11 +1355,8 @@ SITE:${val('wifi-site')}|ADDRESS:${val('wifi-addr')}, ${val('wifi-zip')}
 APs:${val('wifi-aps')}|CABLING:${val('wifi-cabling')}
 HARDWARE:${hwItems.join('; ')||'none'}
 SPECIAL NOTES:${val('wifi-notes')||'none'}
-MATERIALS LINE ITEMS:${getLineItemsText('wifi')}
-MATERIALS:${fmt(p.m||0)}${p.md?` (${p.md}% disc → ${fmt(p.matsNet||0)})`:''}
-LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}${p.ld?` (${p.ld}% disc → ${fmt(p.laborNet||0)})`:''}
-SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
-TOTAL:${fmt(p.total||0)} USD`;
+TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
+TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
 
   } else if (prefix === 'ax') {
     const hwItems = [];
@@ -1378,10 +1374,8 @@ SITE:${val('ax-site')}|ADDRESS:${val('ax-addr')}, ${val('ax-zip')}
 EXPANSION TYPE:${val('ax-type')}|DOORS ADDED:${val('ax-doors')}|CABLING:${val('ax-cabling')}
 HARDWARE:${hwItems.join('; ')||'none'}
 SPECIAL NOTES:${val('ax-notes')||'none'}
-MATERIALS LINE ITEMS:${getLineItemsText('ax')}
-MATERIALS:${fmt(p.m||0)}|LABOR:${p.h||0} hrs × ${fmt(p.r||160)}/hr = ${fmt(p.laborGross||0)}
-SUBTOTAL:${fmt(p.sub||0)}|TAX:${p.tax?`10.55% = ${fmt(p.taxAmt||0)}`:'Exempt'}
-TOTAL:${fmt(p.total||0)} USD`;
+TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
+TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
   }
 
   const outWrap = v('output-wrap');
