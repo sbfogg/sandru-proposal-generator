@@ -428,6 +428,10 @@
       </div>
     </div>
     <div class="field">
+      <label class="field-label">Camera breakdown (optional)</label>
+      <input type="text" id="cam-breakdown" placeholder="e.g. 16 existing, 4 new in new locations — or: 21 takeover">
+    </div>
+    <div class="field">
       <label class="field-label">Recording type</label>
       <select id="cam-recording">
         <option value="nvr">NVR with HDD storage</option>
@@ -950,53 +954,111 @@ Using the job data below, produce a complete proposal in Sandru's house style, m
 VOICE: Third person, plain technical field-tech language, no marketing fluff. Quantities always written as "five (5)" — word followed by numeral in parentheses. Each scope item starts with a verb: "Install...", "Provide and install...", "Run...", "Remove/uninstall...", "Program and configure...", "Test...", "Terminate, test, and label...".
 
 STRUCTURE:
-1. Title line: "[System/Brand] Installation for [Property Name]" or "[Service] for [Property Name]". For access-control systems (ButterflyMX, Doorking, access control expansion), phrase it as "[Brand] Access Control Installation for [Property Name]".
+1. Title line: "[System/Brand] Installation for [Property Name]" or "[Service] for [Property Name]". For access-control systems (ButterflyMX, Doorking, access control expansion), phrase it as "[Brand] Access Control Installation for [Property Name]". For camera systems, name the camera work as "Upgraded Camera System" (installs/upgrades with any new units), "Camera System" (straight new install), or "Camera System Takeover" (taking over an existing system with no new cameras), then " for [Property Name]". When monitoring service is included, append " + 12-Hour Monitoring" BEFORE "for", e.g. "Upgraded Camera System + 12-Hour Monitoring for Ion Queen Anne".
 2. Job Site: property name on its own line, then the street address on the next line, then "City, ST ZIP" on the next line. Abbreviate compass directionals in the street (North → N, South → S, East → E, West → W).
 3. Scope of Work: a bulleted list of work items in the voice above.
    - OPEN with a one-line summary bullet naming the system being installed and the property, e.g. "* Install a new ButterflyMX access control system at [Property Name]". Directly beneath it, add a nested sub-bullet stating how many total doors/openings/zones the system controls and naming them when known from the job data, e.g. "** This system will control one (1) total door; the Main Entrance".
    - Then the work items in this order: remove/uninstall the existing hardware being replaced → provide, install, and program the main device (intercom, controller, or board) → provide and install each supporting network device → test. List the main system device BEFORE the supporting network equipment.
-   - Program the main device "in conjunction with [Vendor] Support" (e.g. "Program and configure this newly installed Butterfly intercom in conjunction with Butterfly Support").
+   - Program the main device "in conjunction with [Vendor] Support" (e.g. "Program and configure this newly installed Butterfly intercom in conjunction with Butterfly Support"). EXCEPTION — camera systems: Sandru runs the NVR and monitoring itself, so program cameras "in conjunction with Sandru Technologies technical support" (e.g. "Program and configure the NVR and camera system in conjunction with Sandru Technologies technical staff; set recording schedules, motion detection zones, and retention settings as required"). When cameras tie into a reused/existing NVR, phrase it as "Program and configure these newly installed cameras as required; tie to the existing NVR and network".
    - Phrase each supporting-equipment item as: "Provide and install [qty] [device] for this system deployment; configure as required." Use "Networking Switch" (never "Networking Switch/Firewall"). Give the UPS Backup Battery a nested sub-bullet: "** This Backup Battery will provide continued power to the system in the event of a power interruption."
    - If cabling is being reused, include it as a bolded lead bullet with nested detail, exactly:
      * *Sandru Technologies will reuse the existing cabling for this system deployment*
      ** If the existing cable is faulty and won't work, or additional cabling is needed, a change-order will be issued with additional charges (pending customer approval)
      *** No new cabling is included in this proposal
-   - Close with "* Test all hardware and the entire system for functionality to ensure proper operation." Do NOT put a customer-training line in Scope — training belongs only in the Labor list.
+   - PARTIAL cabling reuse (mixed/conduit cabling, e.g. reusing existing runs but adding new cabling for new cameras): change the lead line to "* *Sandru Technologies will reuse the existing cabling for the majority of this system deployment*", keep the same change-order sub-bullet, and change the third sub-bullet to "*** The only new cabling included in this proposal is for the [N] new [cameras/devices] being installed in new locations". Use the actual count from the job data.
+   - Close with "* Test all hardware and the entire system for functionality to ensure proper operation." For non-camera systems, do NOT put a customer-training line in Scope — training belongs only in the Labor list. For CAMERA SYSTEM installs/upgrades (any job with new or replaced cameras), add one final scope bullet after the test line: "* Customer training on their new camera system". Omit this training bullet for camera-system TAKEOVERS with no new cameras. When new cabling is run, also include "* Terminate, test, and label all new cabling as required" immediately before the test line.
+3b. CAMERA SYSTEMS — additional scope patterns (apply when TYPE is Camera System):
+   - Opening summary bullet: "* Install an upgraded camera system on site at [Property] and provide 12-hour monitoring service for the installed cameras" (drop the monitoring clause if no monitoring; use "Takeover existing camera video surveillance system at [Property]" for takeovers). Then a nested sub-bullet stating the total camera count AND the breakdown from CAMERA BREAKDOWN when provided, e.g. "** This system will be composed of twenty-six (26) total cameras; ten (10) existing cameras being replaced, six (6) existing cameras being taken over, and ten (10) new cameras in new locations". If CAMERA BREAKDOWN is "n/a", state only the total, e.g. "** This system will consist of twenty-one (21) total cameras across the property".
+   - NVR reuse (when RECORDING is "Reuse existing NVR"): include a bolded lead bullet "* *Sandru Technologies will reuse the existing NVR for this system deployment*" / "** If the existing NVR is faulty and won't work, or a new NVR is required, a change-order will be issued with additional charges (pending customer approval)". When adding a new NVR/hard drive instead, use a normal bullet, e.g. "* Provide and install one (1) 32-Channel NVR with 40TB HDD for this system deployment; configure as required" or "* Provide and install one (1) 20TB Hard Drive for the existing NVR for expanded recording storage; configure as required".
+   - New cabling for new cameras (when CABLING involves new/mixed/conduit): "* Run new cabling as required for the eventual new camera installations" with nested "** Sandru Technologies will also run Conduit as required for these new cable runs (according to WA State Law)".
+   - Camera install line: "* Provide and install [N] 8MP Active Deterrence Cameras throughout the property for this system deployment" (or "position and aim each camera to achieve optimal coverage of the intended area" / "positioned/aimed for optimal coverage"). For takeovers use "* Takeover [N] 8MP Active Deterrence Cameras throughout the property; position and angle each camera to maximize coverage of the designated areas".
+   - Camera systems use BOTH a networking switch AND a separate Router/Firewall as distinct devices — e.g. "* Provide and install one (1) 24-Port PoE Networking Switch for this system deployment; configure as required" and "* Provide and install one (1) Router/Firewall for this system deployment; configure as required". (Never combine them into "Networking Switch/Firewall".) The UPS/Backup Battery keeps its "** This Backup Battery will provide continued power to the system in the event of a power interruption" sub-bullet.
+
 4. Notes: caveats and responsibilities NOT owned by Sandru. Write each as a bolded lead bullet (the lead sentence wrapped in single asterisks) with UNbolded nested detail beneath it. Cover, when applicable:
    - Cabling reuse recap (only if cabling is reused): "* *As stated above, Sandru Technologies will be reusing the existing cabling for this system installation*", with the same change-order sub-bullet and "*** No new cabling is included in this proposal".
    - Database readiness: "* *Before any installation begins, the database for this new system needs to be built and ready for configuration*" / "** This is not Sandru's responsibility; this is done by on-site staff and [Vendor] Support directly".
    - Credentials: "* *Before any installation begins, the new credentials (ex: windshield tags, fobs, etc.) will need to be assigned and distributed to tenants and staff on site*" / "** This is not Sandru's responsibility; this is to be done by on-site staff and [Vendor] Support directly".
    - Internet: "* *At the time of installation, the customer must provide hard-wired internet on-site for this [Vendor] system/installation*".
    - Vendor training: "* *Any system training is to be provided by [Vendor] and their support team*".
-5. Materials: a SINGLE bulleted list of every hardware/material item with its quantity and NO prices — do not split into Sandru-provided vs customer-provided, and do not show per-item costs. Add "* Other miscellaneous materials" as the final bullet. Then, on its own line directly below the list, show the combined materials total exactly as given in the job data (the TOTAL MATERIALS figure), labeled: "Total Materials: $X.XX".
+   - NVR reuse recap (camera systems reusing the existing NVR): "* *As stated above, Sandru Technologies will reuse the existing NVR for this system deployment*" / "** If the existing NVR is faulty and won't work, or a new NVR is required, a change-order will be issued with additional charges (pending customer approval)".
+   - Monitoring intro (camera systems WITH monitoring): "* This proposal includes 12-hour monitoring service for all [N] cameras on the system--more information is provided below" / "** *For this service, the customer will need to provide high-speed internet with a minimum of 8MB/s uploading speed per camera*" / "*** A dedicated public static-IP + handoff will be required as well - this is to be done by the customer".
+   - Remote access (camera systems): "* This system has remote capabilities, and the customer will be able to access the live feeds of any monitored camera from a desktop/mobile device".
+   - Cabling recap for camera systems uses the PARTIAL wording when new cabling was run: "* *As stated above, Sandru Technologies will be reusing the existing cabling for the majority of this system installation*", same change-order sub-bullet, then "*** The only new cabling included in this proposal is for the [N] new cameras being installed in new locations".
+5. Materials: a SINGLE bulleted list of every hardware/material item with its quantity and NO prices — do not split into Sandru-provided vs customer-provided, and do not show per-item costs. Add "* Other miscellaneous materials" as the final bullet. Then, on its own line directly below the list, show the combined materials total exactly as given in the job data (the TOTAL MATERIALS figure), labeled: "Total Materials: $X.XX". For camera systems, in addition to the itemized hardware, always include the two standard supporting-materials bullets "* Camera Brackets, Junction Boxes" and "* Cabling, Conduit, Connectors, Cable Support" just before "* Other miscellaneous materials".
 6. Labor: a bulleted list of the labor categories only — "* Design", "* Installation", "* Setup", "* Programming", "* Customer Training" — with NO hours and NO hourly rate. Then, on its own line directly below, show the labor lump sum exactly as given (the TOTAL LABOR figure), labeled: "Total Labor: $Y.YY".
-7. Do NOT output a Subtotal / Tax / grand Total pricing block — Quotient computes those from the totals entered into it separately. The only dollar figures in the proposal are the "Total Materials" and "Total Labor" lines above. EXCEPTION: if monitoring service is included, still show the monitoring monthly amount and term as a separate recurring line.
-8. ALWAYS close with this exact boilerplate, verbatim (substitute the company entity name where bracketed):
+7. Do NOT output a Subtotal / Tax / grand Total pricing block — Quotient computes those from the totals entered into it separately. The only dollar figures in the proposal are the "Total Materials" and "Total Labor" lines above. If monitoring service is included, the ONLY monitoring dollar figure in the body is the per-camera monthly rate, expressed in the Monitoring Service "Notes:" discount bullet (see the monitoring section below) — do NOT add a separate "monthly recurring total" or contract-term line.
+8. ALWAYS close with this exact boilerplate. Use "Sandru Technologies, LLC" as the company name throughout — never abbreviate it to "Sandru Tech" and never leave a bracketed placeholder. The "Important Notice About Hardware Pricing" paragraph is BOLD (wrapped in single asterisks). The Payment Terms clauses and the Notes and Exclusions items are BULLETED with "* " (with "** " for the overdue sub-line). Reproduce it exactly like this:
 
-"Important Notice About Hardware Pricing
-Due to ongoing fluctuations in global tariffs and supply chain conditions, hardware pricing is subject to change without notice. While we do our best to provide accurate estimates, quoted prices are not guaranteed until confirmed. We kindly ask that you contact us prior to accepting any proposal so we can verify current pricing and availability. This ensures transparency and helps avoid any surprises down the line. We appreciate your understanding and partnership.
+*Important Notice About Hardware Pricing*
+*Due to ongoing fluctuations in global tariffs and supply chain conditions, hardware pricing is subject to change without notice. While we do our best to provide accurate estimates, quoted prices are not guaranteed until confirmed. We kindly ask that you contact us prior to accepting any proposal so we can verify current pricing and availability. This ensures transparency and helps avoid any surprises down the line. We appreciate your understanding and partnership.*
 
 These prices are based upon payment being made by Check or Cash
 We accept credit/debit cards for a 4% processing fee. Let us know prior to invoicing if you wish to use a credit/debit card.
 
-Terms and Conditions:
-Payment Terms
-[Company Entity] requires a 50% down payment prior to starting the project and 50% will be invoiced to the customer as progress billing.
-All invoices received shall be paid by the customer within fifteen (15) days of the date of invoice unless otherwise agreed in writing by [Company Entity]. In the event of late payment, [Company Entity] may charge interest on the amount outstanding before and after the agreement. Invoices that are still unpaid after the invoice due date are subject to late fees. [Company Entity] may impose a monthly surcharge equal to 5% of the outstanding amount.
-15 days overdue = 2.5%; 30 days overdue = 5%
-If any amount of the invoice is disputed by the customer, the customer shall inform [Company Entity] of the grounds for such dispute within seven (7) days of acceptance of the terms and shall pay to [Company Entity] the value of the invoice less the disputed amount in accordance with these payment terms.
-Where [Company Entity] requires payment of a deposit, the customer acknowledges that the deposit is not returnable.
-All fees are exclusive of value-added taxes which will be added to invoices where appropriate.
-[Company Entity] reserves the right to increase a quoted fee in the event that the client requests a variation to the work agreed.
-This proposal is valid only for 30 days from the date it is presented.
+*Terms and Conditions:*
+*Payment Terms*
+* Sandru Technologies, LLC requires a 50% down payment prior to starting the project and 50% will be invoiced to the customer as progress billing.
+* All invoices received shall be paid by the customer within fifteen (15) days of the date of invoice unless otherwise agreed in writing by Sandru Technologies, LLC. In the event of late payment, Sandru Technologies, LLC may charge interest on the amount outstanding before and after the agreement. Invoices that are still unpaid after the invoice due date are subject to late fees. Sandru Technologies, LLC may impose a monthly surcharge equal to 5% of the outstanding amount.
+** 15 days overdue = 2.5%; 30 days overdue = 5%
+* If any amount of the invoice is disputed by the customer, the customer shall inform Sandru Technologies, LLC of the grounds for such dispute within seven (7) days of acceptance of the terms and shall pay to Sandru Technologies, LLC the value of the invoice less the disputed amount in accordance with these payment terms.
+* Where Sandru Technologies, LLC requires payment of a deposit, the customer acknowledges that the deposit is not returnable.
+* All fees are exclusive of value-added taxes which will be added to invoices where appropriate.
+* Sandru Technologies, LLC reserves the right to increase a quoted fee in the event that the client requests a variation to the work agreed.
+* This proposal is valid only for 30 days from the date it is presented.
 
-Notes and Exclusions:
-All painting/patching/drywall work required is to be performed by the owner.
-All work is to be performed during normal hours, 7:00 am to 5:00 pm, Monday through Friday, excluding Holidays.
-Any extra work not included in this Scope of Work, if any, will be performed at an additional cost.
-General Contractor is to provide the valid Reseller Permit. If Reseller Permit is not received, sales tax will be added to the invoice."
+*Notes and Exclusions:*
+* All painting/patching/drywall work required is to be performed by the owner.
+* All work is to be performed during normal hours, 7:00 am to 5:00 pm, Monday through Friday, excluding Holidays.
+* Any extra work not included in this Scope of Work, if any, will be performed at an additional cost.
+* General Contractor is to provide the valid Reseller Permit. If Reseller Permit is not received, sales tax will be added to the invoice.
 
-If the job includes monitoring service, include a "Why Video Monitoring?" section: monitoring is proactive (not just reactive); cameras have two-way communication so dispatchers can talk directly to visitors/trespassers; an actively-monitored camera deters crime because trespassers know someone is watching; cameras have LED lights and sirens for added deterrence; authorities are dispatched only when necessary (rare, since most people leave after dispatch communication or seeing lights/hearing sirens).
+MONITORING SERVICE (when MONITORING is YES): include all of the following. SECTION ORDER for a camera job with monitoring is exactly: Title, *Job Site*, *Scope of Work*, *Notes*, *Why Video Monitoring?* (with the video links), *Materials* (+ Total Materials), *Labor* (+ Total Labor), *Monitoring Service (12-Hour)*, its *Notes:*, then the *Important Notice About Hardware Pricing* / Terms boilerplate.
+
+(a) The "Why Video Monitoring?" section — reproduce this text VERBATIM (the first line and the first video link are bold; substitute nothing except leave it exactly as written):
+
+*Why Video Monitoring?*
+*Unlike a typical camera system deployment, monitoring services allow for a proactive approach to crime prevention.*
+
+Our systems are equipped with cameras that have two-way communication, meaning that our Dispatchers can communicate directly with any visitors via the camera's microphone and speaker.
+
+Most property-related crimes happen when an individual knows that nobody is actively watching/monitoring the area to witness them. When a potential trespasser knows that there's an active Dispatcher monitoring any camera feeds, it often deters them from entering the premises to begin with.
+
+Additionally, our cameras are equipped with LED lights and sirens for added deterrence - if the two-way communication approach isn't enough, the Dispatcher can remotely trigger LED lights and sirens to further deter any trespassers.
+
+If all of these deterrence attempts aren't enough, and a trespasser persists, we will dispatch the local authorities to intervene. This is rarely the case - most individuals leave upon hearing Dispatch/the sirens, or seeing the LEDs flash.
+
+*"Sandru Monitoring - Our System in Action":https://www.youtube.com/playlist?list=PL8zqosssgMP2F7EFKUYKEMdeBYvvVNwGR*
+"Sandru Monitoring - Proactive Video Monitoring":https://www.youtube.com/watch?v=9ggR_hdPXNk
+"Sandru Monitoring - Property Crime in Seattle":https://www.youtube.com/watch?v=bc830vyv8wo
+"Sandru Monitoring - Website":https://www.sandrumonitoring.com/
+
+(b) The "*Monitoring Service (12-Hour)*" section — reproduce this VERBATIM, substituting only [N] with the actual number of monitored cameras from the job data:
+
+*Monitoring Service (12-Hour)*
+* 12-hour monitoring service for [N] cameras positioned throughout the property
+* Coverage is from 6p-6a each day/night
+* Each of our proposed cameras is equipped with two-way communication
+** Two-way communication is an essential feature in incident/theft deterrence
+** This feature allows for communication directly through the camera's microphone
+** Often, this is the first and only response needed to deescalate most incidents
+** Because it's remote intervention via the camera's microphone, staff won't have to physically intervene during an incident, keeping them safe from harm
+* Each proposed camera is equipped with red/blue lights and a siren for additional deterrence purposes
+* Sandru Technologies/Monitoring will use our cloud-based software for monitoring these cameras
+* Our dispatchers will monitor each camera throughout property, including all areas within their FOV
+** They receive real-time event notifications to ensure swift and immediate incident response
+** Actively monitoring these entrances/exits will prevent any piggy-backing/trailing from unauthorized strangers attempting to enter the space (ex: grabbing an already opened door, trailing behind a tenant to gain access)
+** Dispatch will involve the authorities whenever necessary, but will also communicate with on-site staff (concierge, office staff, or on-site security) in the event of an incident
+* We work on a cloud-based system and will provide any recordings via email to the client as needed/requested
+* Incident reports will be provided to the client accordingly
+* Our camera system provides the highest quality resolution on the market - all recordings will be saved in 4K quality
+
+(c) Immediately after that section, add its own "*Notes:*" block:
+
+*Notes:*
+* The customer will need to provide high-speed internet with a minimum of 8MB/s uploading speed per camera
+** A dedicated public static-IP + handoff will be required as well - this is to be done by the customer
+
+Then, ONLY when the monitoring rate in the job data is below the standard $150/camera per month, add the discount note as a bold lead bullet: "* *This monitoring service has been discounted from $150/camera per month to $[rate]/camera per month*" using the actual rate; and when the total camera count is greater than 20, add the nested sub-bullet "** This is a \"bulk deal\" because this system has >20 cameras total". If the rate is the standard $150 (no discount), omit the discount note entirely.
 
 DO NOT invent dollar amounts or tax rates not provided below — use the exact figures given. DO NOT omit the boilerplate sections. DO NOT change any dollar figure from what's specified. Keep scope items grounded only in the job data provided — do not add equipment or steps not implied by it.
 
@@ -1028,11 +1090,15 @@ WHAT TO BOLD — apply single-asterisk bold to exactly these elements and no oth
    *Payment Terms*
    *Notes and Exclusions*
    *Why Video Monitoring?* (only if monitoring is included)
+   *Monitoring Service (12-Hour)* (only if monitoring is included)
 3. Any sub-section header within Scope of Work when the job has clearly separated zones or phases (e.g. *Building 900*, *Clubhouse Scope of Work*, *Property Entrance Scope of Work*) — bold these exactly like major section headers.
 4. The lead line of each Notes caveat bullet, and the cabling-reuse lead bullet in Scope of Work, are wrapped in single-asterisk bold (e.g. "* *Before any installation begins, the database for this new system needs to be built and ready for configuration*"). Their nested ** and *** detail lines are left UNbolded.
-5. Nothing else. Do not bold prices, body text, or ordinary scope bullets beyond those named above.
+5. These specific bold exceptions also apply: the entire "Important Notice About Hardware Pricing" paragraph is bold; the "*Unlike a typical camera system deployment...*" lead line of Why Video Monitoring? is bold; the FIRST video link line ("Sandru Monitoring - Our System in Action") is bold while the other three link lines are not; and the monitoring discount lead bullet is bold.
+6. Nothing else. Do not bold prices, body text, or ordinary scope bullets beyond those named above.
 
 NEVER USE: #, ##, **double asterisks for bold**, numbered lists, | pipe tables, --- dividers, or _ underscores. These are standard Markdown and will appear as raw characters in Quotient.
+
+LINKS: Quotient renders a link written as "Link Text":https://url — the visible label in straight double quotes, immediately followed by a colon and the raw URL with NO space. Do NOT use Markdown link syntax [text](url). Reproduce the four Sandru Monitoring links exactly as given in the Why Video Monitoring? section; to bold the first link, wrap the whole "text":url in single asterisks (*"...":https://...*).
 
 TOTALS: The proposal shows only two dollar figures, each as plain text on its own line directly beneath its section's bulleted list — nothing else. Example:
 Total Materials: $5,000.00
@@ -1324,6 +1390,7 @@ TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
 CLIENT:${val('cam-company')}|CONTACT:${val('cam-contact')}|CC:${val('cam-cc')||'none'}
 SITE:${val('cam-site')}|ADDRESS:${val('cam-addr')}, ${val('cam-zip')}
 TOTAL CAMERAS:${val('cam-total')}|CABLING:${val('cam-cabling')}
+CAMERA BREAKDOWN:${val('cam-breakdown')||'n/a — use total only'}
 RECORDING:${val('cam-recording')}|NVR SPEC:${val('cam-nvr')||'n/a'}
 HARDWARE:${hwItems.join('; ')||'none'}
 MONITORING:${monOn?`YES — ${val('cam-mon-count')} cameras at ${fmt(num('cam-mon-rate'))}/camera/mo, ${val('cam-mon-disc')||0}% disc, ${val('cam-mon-term')} months`:'No monitoring'}
