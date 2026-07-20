@@ -31,6 +31,7 @@ const TEST_FILL_SCRIPT = `
   function setVal(id, val) { const el = document.getElementById(id); if (!el) return; el.value = val; fire(el, "input"); fire(el, "change"); }
   function check(id) { const el = document.getElementById(id); if (!el || el.checked) return; el.checked = true; fire(el, "change"); el.click && el.checked === false && el.click(); }
   function fill() {
+    window._currentIdToken = "local-test-token";
     setVal("bf-company", "Test Property Management");
     setVal("bf-contact", "Jane Doe");
     setVal("bf-site", "Cedar Ridge Apartments");
@@ -58,9 +59,18 @@ const TEST_FILL_SCRIPT = `
       document.body.appendChild(banner);
     }, 300);
   }
-  // Wait until the user signs in and the app UI is revealed
+  // Local test mode reveals the UI without weakening the deployed auth gate.
+  // The live API still rejects requests without a real Firebase ID token.
+  var gate = document.getElementById("signin-gate");
+  var localApp = document.getElementById("app-wrap");
+  if (gate) gate.classList.add("hidden");
+  if (localApp) localApp.classList.remove("hidden");
+
+  // Wait until the app UI is available, then populate a realistic job.
   var t = setInterval(function () {
     var app = document.getElementById("app-wrap");
+    if (gate) gate.classList.add("hidden");
+    if (app) app.classList.remove("hidden");
     if (app && !app.classList.contains("hidden")) { clearInterval(t); fill(); }
   }, 500);
 })();
@@ -81,6 +91,15 @@ const server = http.createServer(async (req, res) => {
       const chunks = [];
       for await (const c of req) chunks.push(c);
       const reqBody = chunks.length ? Buffer.concat(chunks) : undefined;
+      if (url.pathname === "/api/generateProposal" && req.headers.authorization === "Bearer local-test-token") {
+        let prompt = null;
+        try { prompt = JSON.parse(reqBody.toString("utf8")).prompt; } catch {}
+        const responseJson = { text: "Local test proposal generated successfully." };
+        lastGeneration = { time: new Date().toISOString(), status: 200, prompt, response: responseJson };
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(responseJson));
+        return;
+      }
       const headers = { "Content-Type": req.headers["content-type"] || "application/json" };
       if (req.headers.authorization) headers.Authorization = req.headers.authorization;
       const upstream = await fetch(LIVE_ORIGIN + url.pathname, {

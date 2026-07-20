@@ -228,6 +228,48 @@
     cursor: pointer; font-family: inherit;
   }
   #signout-btn:hover { color: white; }
+
+  /* DRAFTS, TEMPLATES, VALIDATION & HISTORY */
+  .workspace-tools {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
+    padding: 14px 16px; margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+  .workspace-tools-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .autosave-status { font-size: 12px; color: var(--gray-600); }
+  .autosave-status.saved { color: #287a43; }
+  .workspace-actions { display: grid; grid-template-columns: auto minmax(150px, 0.8fr) minmax(180px, 1fr) auto auto auto; gap: 8px; }
+  .secondary-btn {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    color: var(--gray-800); font-family: inherit; font-size: 13px; font-weight: 500;
+    padding: 9px 12px; cursor: pointer;
+  }
+  .secondary-btn:hover { background: var(--gray-50); border-color: var(--gray-400); }
+  .secondary-btn.danger { color: var(--red); }
+  .validation-summary {
+    border: 1px solid #e5aaa4; background: #fff6f5; color: var(--red-dark);
+    border-radius: var(--radius); padding: 12px 14px; margin-bottom: 16px; font-size: 13px;
+  }
+  .validation-summary strong { display: block; margin-bottom: 4px; }
+  .validation-summary ul { margin-left: 18px; }
+  .field-invalid { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(192,57,43,0.1) !important; }
+  .history-card { margin-top: 20px; }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-empty { color: var(--gray-400); font-size: 13px; }
+  .history-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-name { font-size: 14px; font-weight: 500; }
+  .history-meta { font-size: 12px; color: var(--gray-400); }
+  .history-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .history-actions .secondary-btn { padding: 6px 9px; }
+  @media (max-width: 600px) {
+    .workspace-tools-top { align-items: flex-start; flex-direction: column; }
+    .workspace-actions { grid-template-columns: 1fr 1fr; }
+    .workspace-actions #template-name, .workspace-actions select { grid-column: 1 / -1; }
+    .history-item { align-items: flex-start; flex-direction: column; }
+  }
 </style>
 </head>
 <body>
@@ -264,6 +306,23 @@
 </div>
 
 <main>
+
+<section class="workspace-tools" aria-label="Draft and template tools">
+  <div class="workspace-tools-top">
+    <strong>Draft workspace</strong>
+    <span id="autosave-status" class="autosave-status" aria-live="polite">Draft autosave ready</span>
+  </div>
+  <div class="workspace-actions">
+    <button type="button" class="secondary-btn danger" onclick="clearCurrentDraft()">New proposal</button>
+    <input type="text" id="template-name" placeholder="Template name" aria-label="Template name">
+    <select id="template-select" aria-label="Saved templates"><option value="">Choose a saved template…</option></select>
+    <button type="button" class="secondary-btn" onclick="saveTemplate()">Save template</button>
+    <button type="button" class="secondary-btn" onclick="loadSelectedTemplate()">Load template</button>
+    <button type="button" class="secondary-btn danger" onclick="deleteSelectedTemplate()">Delete</button>
+  </div>
+</section>
+
+<div id="validation-summary" class="validation-summary hidden" role="alert" aria-live="assertive"></div>
 
 <!-- ===================== BUTTERFLY MX ===================== -->
 <div id="type-butterfly">
@@ -853,6 +912,11 @@
   <button class="generate-btn" id="copy-btn" onclick="copyOutput()">Copy to Clipboard</button>
 </div>
 
+<section class="card history-card">
+  <div class="card-title">Recent generated proposals</div>
+  <div id="proposal-history" class="history-list"></div>
+</section>
+
 </main>
 
 </div>
@@ -1118,9 +1182,246 @@ function v(id) { return document.getElementById(id); }
 function val(id) { return (v(id) ? v(id).value.trim() : ''); }
 function num(id) { return parseFloat(v(id)?.value) || 0; }
 
+const STORAGE_KEYS = {
+  draft: 'sandruProposalDraftV1',
+  templates: 'sandruProposalTemplatesV1',
+  history: 'sandruProposalHistoryV1'
+};
+const PREFIX_TO_TYPE = {bf:'butterfly',cam:'camera',dk:'doorking',dh:'doorhardware',wifi:'wifi',ax:'accessexpansion'};
+const TYPE_LABELS = {butterfly:'ButterflyMX',camera:'Camera System',doorking:'Doorking Repair',doorhardware:'Door Hardware',wifi:'WiFi / Networking',accessexpansion:'Access Expansion'};
+let currentType = 'butterfly';
+let autosaveTimer = null;
+let isRestoringState = false;
+
+function readStorage(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (err) {
+    console.warn('Could not read saved proposal data', err);
+    return fallback;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (err) {
+    console.warn('Could not save proposal data', err);
+    const status = v('autosave-status');
+    if (status) { status.textContent = 'Autosave unavailable'; status.classList.remove('saved'); }
+    return false;
+  }
+}
+
+function serializeWorkspace() {
+  const controls = {};
+  document.querySelectorAll('main input[id], main select[id], main textarea[id]').forEach(el => {
+    if (el.id === 'output-text' || el.id === 'template-select' || el.id === 'template-name') return;
+    controls[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+
+  const quantities = {};
+  document.querySelectorAll('.cb-row input[type=checkbox][id]').forEach(cb => {
+    const qty = cb.parentElement.querySelector('.cb-qty');
+    if (qty) quantities[cb.id] = qty.value;
+  });
+
+  const custom = {};
+  document.querySelectorAll('[id$="-custom"]').forEach(container => {
+    custom[container.id] = Array.from(container.querySelectorAll('.custom-row input[type=text]')).map(input => input.value);
+  });
+
+  const lineItems = {};
+  ['bf','cam','dk','dh','wifi','ax'].forEach(prefix => {
+    const container = v(prefix + '-lineitems');
+    lineItems[prefix] = container ? Array.from(container.querySelectorAll('.line-item-row')).map(row => ({
+      name: row.querySelector('input[type=text]')?.value || '',
+      price: row.querySelector('input[type=number]')?.value || '',
+      checkboxId: row.dataset.checkboxId || ''
+    })) : [];
+  });
+
+  return { version: 1, savedAt: new Date().toISOString(), activeType: currentType, controls, quantities, custom, lineItems };
+}
+
+function restoreWorkspace(snapshot) {
+  if (!snapshot || !snapshot.controls) return false;
+  isRestoringState = true;
+  try {
+    Object.entries(snapshot.controls).forEach(([id, value]) => {
+      const el = v(id);
+      if (!el) return;
+      if (el.type === 'checkbox') el.checked = Boolean(value);
+      else el.value = value;
+    });
+    Object.entries(snapshot.quantities || {}).forEach(([checkboxId, value]) => {
+      const cb = v(checkboxId);
+      const qty = cb?.parentElement.querySelector('.cb-qty');
+      if (qty) { qty.value = value; qty.disabled = !cb.checked; }
+    });
+    document.querySelectorAll('[id$="-custom"]').forEach(container => { container.innerHTML = ''; });
+    Object.entries(snapshot.custom || {}).forEach(([containerId, values]) => {
+      values.forEach(value => addCustom(containerId, value));
+    });
+    Object.keys(checkboxLineItemRows).forEach(key => delete checkboxLineItemRows[key]);
+    ['bf','cam','dk','dh','wifi','ax'].forEach(prefix => {
+      const container = v(prefix + '-lineitems');
+      if (container) container.innerHTML = '';
+      (snapshot.lineItems?.[prefix] || []).forEach(item => createLineItemRow(prefix, item.name, item.price, item.checkboxId));
+      recalcLineItems(prefix);
+    });
+    toggleMonitoring();
+    onBmxSupplyChange();
+    // Reapply explicitly entered material totals after line-item reconstruction;
+    // users are allowed to override the calculated line-item sum.
+    ['bf','cam','dk','dh','wifi','ax'].forEach(prefix => {
+      const savedMaterials = snapshot.controls[prefix + '-mcost'];
+      if (savedMaterials !== undefined && v(prefix + '-mcost')) v(prefix + '-mcost').value = savedMaterials;
+      calcPrice(prefix);
+    });
+    switchType(snapshot.activeType && types.includes(snapshot.activeType) ? snapshot.activeType : 'butterfly');
+    clearValidation();
+    return true;
+  } finally {
+    isRestoringState = false;
+  }
+}
+
+function scheduleAutosave() {
+  if (isRestoringState) return;
+  const status = v('autosave-status');
+  if (status) { status.textContent = 'Saving draft…'; status.classList.remove('saved'); }
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => {
+    if (writeStorage(STORAGE_KEYS.draft, serializeWorkspace()) && status) {
+      status.textContent = 'Draft saved ' + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+      status.classList.add('saved');
+    }
+  }, 350);
+}
+
+function clearCurrentDraft() {
+  if (!confirm('Start a new proposal? This clears the current autosaved draft. Saved templates and proposal history will remain.')) return;
+  localStorage.removeItem(STORAGE_KEYS.draft);
+  location.reload();
+}
+
+function saveTemplate() {
+  const nameInput = v('template-name');
+  const name = nameInput?.value.trim();
+  if (!name) {
+    nameInput.classList.add('field-invalid');
+    nameInput.focus();
+    return;
+  }
+  const templates = readStorage(STORAGE_KEYS.templates, []);
+  const cleanName = name;
+  const existing = templates.findIndex(item => item.name.toLowerCase() === cleanName.toLowerCase());
+  const template = { id: existing >= 0 ? templates[existing].id : String(Date.now()), name: cleanName, updatedAt: new Date().toISOString(), snapshot: serializeWorkspace() };
+  if (existing >= 0) templates[existing] = template; else templates.unshift(template);
+  writeStorage(STORAGE_KEYS.templates, templates.slice(0, 50));
+  renderTemplates(template.id);
+  nameInput.value = '';
+  const status = v('autosave-status');
+  if (status) { status.textContent = 'Template saved'; status.classList.add('saved'); }
+}
+
+function renderTemplates(selectedId) {
+  const select = v('template-select');
+  if (!select) return;
+  const templates = readStorage(STORAGE_KEYS.templates, []);
+  select.innerHTML = '<option value="">Choose a saved template…</option>';
+  templates.forEach(template => {
+    const option = document.createElement('option');
+    option.value = template.id;
+    option.textContent = template.name;
+    option.selected = template.id === selectedId;
+    select.appendChild(option);
+  });
+}
+
+function loadSelectedTemplate() {
+  const id = v('template-select')?.value;
+  if (!id) return;
+  const template = readStorage(STORAGE_KEYS.templates, []).find(item => item.id === id);
+  if (!template) return;
+  restoreWorkspace(template.snapshot);
+  v('template-name').value = template.name;
+  writeStorage(STORAGE_KEYS.draft, serializeWorkspace());
+  const status = v('autosave-status');
+  if (status) { status.textContent = 'Template loaded'; status.classList.add('saved'); }
+}
+
+function deleteSelectedTemplate() {
+  const id = v('template-select')?.value;
+  if (!id) return;
+  const templates = readStorage(STORAGE_KEYS.templates, []);
+  const template = templates.find(item => item.id === id);
+  if (!template || !confirm('Delete the “' + template.name + '” template?')) return;
+  writeStorage(STORAGE_KEYS.templates, templates.filter(item => item.id !== id));
+  renderTemplates();
+}
+
+function addProposalToHistory(prefix, text) {
+  const history = readStorage(STORAGE_KEYS.history, []);
+  const site = val(prefix + '-site');
+  const company = val(prefix + '-company');
+  history.unshift({
+    id: String(Date.now()), createdAt: new Date().toISOString(), type: PREFIX_TO_TYPE[prefix],
+    name: site || company || TYPE_LABELS[PREFIX_TO_TYPE[prefix]], company, site, text, snapshot: serializeWorkspace()
+  });
+  writeStorage(STORAGE_KEYS.history, history.slice(0, 20));
+  renderHistory();
+}
+
+function renderHistory() {
+  const container = v('proposal-history');
+  if (!container) return;
+  const history = readStorage(STORAGE_KEYS.history, []);
+  container.innerHTML = '';
+  if (!history.length) {
+    const empty = document.createElement('p'); empty.className = 'history-empty';
+    empty.textContent = 'Generated proposals will appear here on this browser.';
+    container.appendChild(empty); return;
+  }
+  history.forEach(item => {
+    const row = document.createElement('div'); row.className = 'history-item';
+    const info = document.createElement('div');
+    const name = document.createElement('div'); name.className = 'history-name'; name.textContent = item.name;
+    const meta = document.createElement('div'); meta.className = 'history-meta';
+    meta.textContent = (TYPE_LABELS[item.type] || 'Proposal') + ' • ' + new Date(item.createdAt).toLocaleString();
+    info.append(name, meta);
+    const actions = document.createElement('div'); actions.className = 'history-actions';
+    const open = document.createElement('button'); open.type = 'button'; open.className = 'secondary-btn'; open.textContent = 'Open';
+    open.addEventListener('click', () => openHistoryItem(item.id));
+    const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'secondary-btn danger'; remove.textContent = 'Delete';
+    remove.addEventListener('click', () => deleteHistoryItem(item.id));
+    actions.append(open, remove); row.append(info, actions); container.appendChild(row);
+  });
+}
+
+function openHistoryItem(id) {
+  const item = readStorage(STORAGE_KEYS.history, []).find(entry => entry.id === id);
+  if (!item) return;
+  restoreWorkspace(item.snapshot);
+  v('output-text').value = item.text || '';
+  v('output-wrap').style.display = '';
+  writeStorage(STORAGE_KEYS.draft, serializeWorkspace());
+  v('output-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function deleteHistoryItem(id) {
+  const history = readStorage(STORAGE_KEYS.history, []).filter(item => item.id !== id);
+  writeStorage(STORAGE_KEYS.history, history);
+  renderHistory();
+}
+
 // ── TAB SWITCHING ─────────────────────────────────────────────
 const types = ['butterfly','camera','doorking','doorhardware','wifi','accessexpansion'];
 function switchType(t) {
+  currentType = t;
   types.forEach(id => {
     document.getElementById('type-' + id).classList.toggle('hidden', id !== t);
   });
@@ -1128,6 +1429,7 @@ function switchType(t) {
     btn.classList.toggle('active', types[i] === t);
   });
   calcPrice(prefixFor(t));
+  scheduleAutosave();
 }
 function prefixFor(t) {
   return {butterfly:'bf',camera:'cam',doorking:'dk',doorhardware:'dh',wifi:'wifi',accessexpansion:'ax'}[t];
@@ -1150,26 +1452,43 @@ document.querySelectorAll('.cb-qty').forEach(qtyInput => {
 });
 
 // ── ADD CUSTOM ITEM ───────────────────────────────────────────
-function addCustom(containerId) {
+function addCustom(containerId, initialValue = '') {
   const d = document.createElement('div');
   d.className = 'custom-row';
-  d.innerHTML = '<input type="text" placeholder="Custom item" /><button class="rm-btn" onclick="this.parentNode.remove()">×</button>';
+  d.innerHTML = '<input type="text" placeholder="Custom item" /><button type="button" class="rm-btn" aria-label="Remove custom item">×</button>';
+  d.querySelector('input').value = initialValue;
+  d.querySelector('button').addEventListener('click', () => { d.remove(); scheduleAutosave(); });
   document.getElementById(containerId).appendChild(d);
+  scheduleAutosave();
 }
 
 // ── MATERIALS LINE ITEMS ──────────────────────────────────────
 function addLineItem(prefix) {
+  createLineItemRow(prefix, '', '', '');
+  recalcLineItems(prefix);
+  scheduleAutosave();
+}
+
+function createLineItemRow(prefix, name = '', price = '', checkboxId = '') {
   const container = document.getElementById(prefix + '-lineitems');
   const row = document.createElement('div');
   row.className = 'line-item-row';
+  if (checkboxId) row.dataset.checkboxId = checkboxId;
   row.innerHTML =
     '<input type="text" placeholder="Item name (optional)" />' +
     '<input type="number" placeholder="0.00" step="0.01" />' +
-    '<button class="rm-btn" type="button" onclick="this.parentNode.remove(); recalcLineItems(\'' + prefix + '\')">×</button>';
+    '<button class="rm-btn" type="button" aria-label="Remove line item">×</button>';
+  row.querySelector('input[type=text]').value = name;
+  row.querySelector('input[type=number]').value = price;
   const priceInput = row.querySelector('input[type=number]');
   priceInput.addEventListener('input', () => recalcLineItems(prefix));
+  row.querySelector('button').addEventListener('click', () => {
+    if (checkboxId) removeCheckboxLineItem(checkboxId);
+    else { row.remove(); recalcLineItems(prefix); scheduleAutosave(); }
+  });
   container.appendChild(row);
-  recalcLineItems(prefix);
+  if (checkboxId) checkboxLineItemRows[checkboxId] = row;
+  return row;
 }
 
 function recalcLineItems(prefix) {
@@ -1214,19 +1533,11 @@ function syncCheckboxLineItem(checkbox) {
 
   let row = checkboxLineItemRows[checkbox.id];
   if (!row || !row.isConnected) {
-    row = document.createElement('div');
-    row.className = 'line-item-row';
-    row.innerHTML =
-      '<input type="text" placeholder="Item name (optional)" />' +
-      '<input type="number" placeholder="0.00" step="0.01" />' +
-      '<button class="rm-btn" type="button" onclick="removeCheckboxLineItem(\'' + checkbox.id + '\')">×</button>';
-    const priceInput = row.querySelector('input[type=number]');
-    priceInput.addEventListener('input', () => recalcLineItems(prefix));
-    container.appendChild(row);
-    checkboxLineItemRows[checkbox.id] = row;
+    row = createLineItemRow(prefix, displayName, '', checkbox.id);
   }
   row.querySelector('input[type=text]').value = displayName;
   recalcLineItems(prefix);
+  scheduleAutosave();
 }
 
 function removeCheckboxLineItem(checkboxId) {
@@ -1243,6 +1554,7 @@ function removeCheckboxLineItem(checkboxId) {
     if (qty && qty.style.visibility !== 'hidden') qty.disabled = true;
   }
   recalcLineItems(prefix);
+  scheduleAutosave();
 }
 
 // When the ButterflyMX supply source changes, re-sync every already-checked BMX
@@ -1348,8 +1660,95 @@ function getItems(listId, customId) {
   return items;
 }
 
+// ── VALIDATION ────────────────────────────────────────────────
+function clearValidation() {
+  document.querySelectorAll('.field-invalid').forEach(el => el.classList.remove('field-invalid'));
+  const summary = v('validation-summary');
+  if (summary) { summary.classList.add('hidden'); summary.innerHTML = ''; }
+}
+
+function fieldLabel(id) {
+  const el = v(id);
+  return el?.closest('.field')?.querySelector('.field-label')?.textContent?.trim() || id;
+}
+
+function validateProposal(prefix) {
+  clearValidation();
+  const requiredByPrefix = {
+    bf: ['bf-company','bf-contact','bf-site','bf-addr','bf-zip','bf-doors','bf-lhrs','bf-lrate'],
+    cam: ['cam-company','cam-contact','cam-site','cam-addr','cam-zip','cam-total','cam-lhrs','cam-lrate'],
+    dk: ['dk-company','dk-contact','dk-site','dk-addr','dk-zip','dk-reason','dk-lhrs','dk-lrate'],
+    dh: ['dh-company','dh-contact','dh-site','dh-addr','dh-zip','dh-scope','dh-lhrs','dh-lrate'],
+    wifi: ['wifi-company','wifi-contact','wifi-site','wifi-addr','wifi-zip','wifi-aps','wifi-lhrs','wifi-lrate'],
+    ax: ['ax-company','ax-contact','ax-site','ax-addr','ax-zip','ax-doors','ax-lhrs','ax-lrate']
+  };
+  const errors = [];
+  let firstInvalid = null;
+  const addError = (message, el) => {
+    errors.push(message);
+    if (el) { el.classList.add('field-invalid'); if (!firstInvalid) firstInvalid = el; }
+  };
+
+  (requiredByPrefix[prefix] || []).forEach(id => {
+    const el = v(id);
+    if (!el || !String(el.value).trim() || (el.type === 'number' && Number(el.value) <= 0)) {
+      addError(fieldLabel(id) + ' is required.', el);
+    }
+  });
+
+  if (prefix === 'bf' && val('bf-existing') === 'custom' && !val('bf-custom-sys')) {
+    addError('Custom existing system is required.', v('bf-custom-sys'));
+  }
+  if (prefix === 'cam' && ['nvr','ivmss'].includes(val('cam-recording')) && !val('cam-nvr')) {
+    addError('NVR / IVMSS spec is required for the selected recording type.', v('cam-nvr'));
+  }
+  if (prefix === 'cam' && v('cam-monitoring')?.checked) {
+    if (num('cam-mon-count') <= 0) addError('Monitoring camera count is required.', v('cam-mon-count'));
+    if (num('cam-mon-rate') <= 0) addError('Monitoring rate is required.', v('cam-mon-rate'));
+  }
+
+  ['ldisc','mdisc','odisc'].forEach(suffix => {
+    const el = v(prefix + '-' + suffix);
+    if (el && (Number(el.value) < 0 || Number(el.value) > 100)) addError(fieldLabel(el.id) + ' must be between 0 and 100.', el);
+  });
+
+  const lineItems = v(prefix + '-lineitems');
+  lineItems?.querySelectorAll('.line-item-row').forEach(row => {
+    const name = row.querySelector('input[type=text]');
+    const price = row.querySelector('input[type=number]');
+    if (name.value.trim() && !price.value.trim()) addError('Enter a price for “' + name.value.trim() + '”.', price);
+    if (!name.value.trim() && price.value.trim()) addError('Enter a name for the $' + Number(price.value).toFixed(2) + ' line item.', name);
+  });
+
+  if (errors.length) {
+    const summary = v('validation-summary');
+    const heading = document.createElement('strong'); heading.textContent = 'Please complete these items before generating:';
+    const list = document.createElement('ul');
+    errors.forEach(message => { const li = document.createElement('li'); li.textContent = message; list.appendChild(li); });
+    summary.append(heading, list); summary.classList.remove('hidden');
+    summary.scrollIntoView({behavior:'smooth', block:'start'});
+    if (firstInvalid) setTimeout(() => firstInvalid.focus(), 350);
+    return false;
+  }
+  return true;
+}
+
+function setGenerating(prefix, generating) {
+  const btn = document.querySelector(`button.generate-btn[onclick="generate('${prefix}')"]`);
+  if (!btn) return;
+  if (generating) {
+    btn.dataset.origText = btn.dataset.origText || btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+  } else {
+    btn.disabled = false;
+    btn.textContent = btn.dataset.origText || 'Generate proposal text →';
+  }
+}
+
 // ── GENERATE ─────────────────────────────────────────────────
 function generate(prefix) {
+  if (!validateProposal(prefix)) return;
   const p = (window._prices || {})[prefix] || {};
 
   let data = {};
@@ -1478,18 +1877,16 @@ TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
 
   const outWrap = v('output-wrap');
   const outText = v('output-text');
-  const btn = document.querySelector(`button.generate-btn[onclick="generate('${prefix}')"]`);
 
   outText.value = 'Generating proposal…';
   outWrap.style.display = '';
   outText.scrollIntoView({behavior:'smooth', block:'start'});
-  if (btn) { btn.disabled = true; btn.dataset.origText = btn.textContent; btn.textContent = 'Generating…'; }
 
   if (!window._currentIdToken) {
     outText.value = 'Error: not signed in. Please refresh and sign in again.';
-    outWrap.style.display = '';
     return;
   }
+  setGenerating(prefix, true);
 
   fetch(GENERATE_PROPOSAL_URL, {
     method: 'POST',
@@ -1499,20 +1896,23 @@ TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
     },
     body: JSON.stringify({ prompt })
   })
-    .then(res => {
-      if (!res.ok) {
-        return res.json().then(err => { throw new Error(err.error || ('HTTP ' + res.status)); });
-      }
-      return res.json();
+    .then(async res => {
+      const raw = await res.text();
+      let data;
+      try { data = JSON.parse(raw); }
+      catch { data = { error: raw ? raw.slice(0, 240) : ('HTTP ' + res.status) }; }
+      if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      return data;
     })
     .then(data => {
       outText.value = data.text;
-      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.origText; }
+      addProposalToHistory(prefix, data.text);
+      scheduleAutosave();
     })
     .catch(err => {
       outText.value = 'Error generating proposal: ' + (err && err.message ? err.message : err);
-      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.origText; }
-    });
+    })
+    .finally(() => setGenerating(prefix, false));
 }
 
 function copyOutput() {
@@ -1526,8 +1926,34 @@ function copyOutput() {
   });
 }
 
+function syncConditionalFields() {
+  v('bf-custom-wrap')?.classList.toggle('hidden', val('bf-existing') !== 'custom');
+  const recording = val('cam-recording');
+  v('cam-nvr-wrap')?.classList.toggle('hidden', !['nvr','ivmss'].includes(recording));
+}
+
+document.querySelector('main').addEventListener('input', event => {
+  if (event.target.id !== 'output-text') {
+    event.target.classList.remove('field-invalid');
+    scheduleAutosave();
+  }
+});
+document.querySelector('main').addEventListener('change', event => {
+  if (event.target.id === 'bf-existing' || event.target.id === 'cam-recording') syncConditionalFields();
+  scheduleAutosave();
+});
+
 // ── INIT ALL PRICE TABLES ─────────────────────────────────────
 ['bf','cam','dk','dh','wifi','ax'].forEach(calcPrice);
+syncConditionalFields();
+renderTemplates();
+renderHistory();
+const savedDraft = readStorage(STORAGE_KEYS.draft, null);
+if (savedDraft && restoreWorkspace(savedDraft)) {
+  const status = v('autosave-status');
+  status.textContent = 'Autosaved draft restored';
+  status.classList.add('saved');
+}
 </script>
 </body>
 </html>

@@ -65,6 +65,18 @@ firebase functions:secrets:set ANTHROPIC_API_KEY
 
 Only accounts on the `sandrutech.com` domain (verified + email-verified) can call `generateProposal`. This is enforced server-side in `functions/index.js`, not just in the frontend UI.
 
+## Drafts, templates, and history
+
+- The current working proposal is automatically saved in that browser and restored after a refresh.
+- Named templates can be saved, loaded, overwritten, and deleted from the Draft workspace toolbar.
+- The 20 most recently generated proposals are stored locally with their completed form data and generated text.
+- Drafts, templates, and history remain in browser storage; they are not uploaded to a separate database.
+- Required client, site, scope, labor, monitoring, discount, and line-item fields are validated before an API request is sent.
+
+## Local UI testing
+
+Run `node dev-server.js`, then open `http://localhost:8123/?testfill=1`. Test mode reveals the local UI, fills a realistic ButterflyMX job, and returns a local canned proposal for generation requests. It does not bypass authentication on the deployed site or live Cloud Function.
+
 ## Notes
 
 - Do **not** sync this project folder through Google Drive Desktop for active development — Drive can auto-convert files like `.html` into Google Docs (`.gdoc`) format, corrupting them. Use git for version control and machine-to-machine transfer instead.
