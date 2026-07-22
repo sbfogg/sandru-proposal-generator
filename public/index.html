@@ -304,6 +304,7 @@
   <button class="type-btn" onclick="switchType('astragal')">🛡️ Astragal Installation</button>
   <button class="type-btn" onclick="switchType('wifi')">📶 WiFi / Networking</button>
   <button class="type-btn" onclick="switchType('accessexpansion')">🔑 Access Expansion</button>
+  <button class="type-btn" onclick="switchType('email')">✉️ Monitoring Email</button>
 </div>
 
 <main>
@@ -999,8 +1000,44 @@
   <button class="generate-btn" onclick="generate('ax')">Generate proposal text →</button>
 </div>
 
+<!-- ===================== MONITORING INTRO EMAIL ===================== -->
+<div id="type-email" class="hidden">
+  <p class="page-title">Monitoring Intro Email</p>
+  <p class="page-sub">Fills the Sandru Monitoring pitch email. No AI — the wording is fixed, so it never changes; you just fill in the blanks.</p>
+
+  <div class="card">
+    <div class="card-title">Recipient &amp; property</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Recipient first name</label><input type="text" id="em-first" placeholder="e.g. Leo" oninput="buildEmail()"></div>
+      <div class="field"><label class="field-label">Property name</label><input type="text" id="em-property" placeholder="e.g. Beam Apartments" oninput="buildEmail()"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Links</div>
+    <div class="field"><label class="field-label">Scheduling link (call / demo)</label><input type="text" id="em-sched" placeholder="Leave blank until you have one" oninput="buildEmail()"></div>
+    <div class="field"><label class="field-label">Sign-up link</label><input type="text" id="em-signup" placeholder="Leave blank until you have one" oninput="buildEmail()"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Your signature</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Your name</label><input type="text" id="em-name" placeholder="e.g. Mike Sandru" oninput="buildEmail()"></div>
+      <div class="field"><label class="field-label">Your title</label><input type="text" id="em-title" placeholder="e.g. Operations Manager" oninput="buildEmail()"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Phone number</label><input type="text" id="em-phone" placeholder="e.g. (425) 555-0134" oninput="buildEmail()"></div>
+      <div class="field"><label class="field-label">Email address</label><input type="text" id="em-email" placeholder="you@sandrutech.com" oninput="buildEmail()"></div>
+    </div>
+  </div>
+
+  <div id="em-warn" class="hidden" style="margin:14px 0;padding:10px 14px;border-radius:8px;background:#4a3410;border:1px solid #b45309;color:#fbbf24;font-size:13px;line-height:1.5;"></div>
+
+  <button class="generate-btn" onclick="buildEmail()">Build email →</button>
+</div>
+
 <div class="field" id="output-wrap" style="display:none;">
-  <label class="field-label">Generated proposal</label>
+  <label class="field-label" id="output-label">Generated proposal</label>
   <textarea id="output-text" readonly style="width:100%; min-height:300px; font-family:monospace; white-space:pre-wrap;"></textarea>
   <button class="generate-btn" id="copy-btn" onclick="copyOutput()">Copy to Clipboard</button>
 </div>
@@ -1082,6 +1119,9 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   window._currentIdToken = await user.getIdToken();
+  // Expose the signed-in identity so the Monitoring Email tab can prefill the signature.
+  window._currentUser = { name: user.displayName || '', email };
+  if (typeof window.prefillEmailSender === 'function') window.prefillEmailSender();
   gate.classList.add('hidden');
   app.classList.remove('hidden');
 });
@@ -1293,7 +1333,7 @@ const STORAGE_KEYS = {
   history: 'sandruProposalHistoryV1'
 };
 const PREFIX_TO_TYPE = {bf:'butterfly',cam:'camera',dk:'doorking',dh:'doorhardware',ast:'astragal',wifi:'wifi',ax:'accessexpansion'};
-const TYPE_LABELS = {butterfly:'ButterflyMX',camera:'Camera System',doorking:'Doorking Repair',doorhardware:'Door Hardware',astragal:'Astragal Installation',wifi:'WiFi / Networking',accessexpansion:'Access Expansion'};
+const TYPE_LABELS = {butterfly:'ButterflyMX',camera:'Camera System',doorking:'Doorking Repair',doorhardware:'Door Hardware',astragal:'Astragal Installation',wifi:'WiFi / Networking',accessexpansion:'Access Expansion',email:'Monitoring Email'};
 let currentType = 'butterfly';
 let autosaveTimer = null;
 let isRestoringState = false;
@@ -1524,7 +1564,7 @@ function deleteHistoryItem(id) {
 }
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
-const types = ['butterfly','camera','doorking','doorhardware','astragal','wifi','accessexpansion'];
+const types = ['butterfly','camera','doorking','doorhardware','astragal','wifi','accessexpansion','email'];
 function switchType(t) {
   currentType = t;
   types.forEach(id => {
@@ -1533,11 +1573,100 @@ function switchType(t) {
   document.querySelectorAll('.type-btn').forEach((btn, i) => {
     btn.classList.toggle('active', types[i] === t);
   });
-  calcPrice(prefixFor(t));
+  if (t === 'email') {
+    prefillEmailSender();
+    buildEmail();
+  } else {
+    calcPrice(prefixFor(t));
+  }
   scheduleAutosave();
 }
 function prefixFor(t) {
   return {butterfly:'bf',camera:'cam',doorking:'dk',doorhardware:'dh',astragal:'ast',wifi:'wifi',accessexpansion:'ax'}[t];
+}
+
+// ── MONITORING INTRO EMAIL ──────────────────────────────────
+// Deterministic template fill — no API call. Blank fields stay visible as
+// placeholders and trigger a warning so incomplete emails are easy to spot.
+const EMAIL_BLANKS = {
+  'em-first':    '[First Name]',
+  'em-property': '[Property Name]',
+  'em-sched':    '[Insert scheduling link]',
+  'em-signup':   '[Insert sign-up link]',
+  'em-name':     '[Your Name]',
+  'em-title':    '[Your Title]',
+  'em-phone':    '[Phone Number]',
+  'em-email':    '[Email Address]'
+};
+
+function prefillEmailSender() {
+  const u = window._currentUser;
+  if (!u) return;
+  if (v('em-name') && !v('em-name').value && u.name) v('em-name').value = u.name;
+  if (v('em-email') && !v('em-email').value && u.email) v('em-email').value = u.email;
+}
+window.prefillEmailSender = prefillEmailSender;
+
+function buildEmail() {
+  const f = id => val(id) || EMAIL_BLANKS[id];
+  const first = f('em-first');
+  const property = f('em-property');
+  const sched = f('em-sched');
+  const signup = f('em-signup');
+  const name = f('em-name');
+  const title = f('em-title');
+  const phone = f('em-phone');
+  const email = f('em-email');
+
+  const body = `Subject: Sandru Monitoring: Proactive Video Monitoring for ${property}
+
+Dear ${first},
+
+Thank you for your interest in Sandru Monitoring, a proactive video monitoring company (sister company to Sandru Technologies). Here's how we can help protect ${property} and prevent crime before it happens.
+
+Why Sandru Monitoring
+
+Unlike a standard camera system that only records after the fact, we actively deter crime in real time. Most incidents happen when someone believes no one's watching — our live Dispatchers change that:
+
+- Two-way communication: Dispatchers speak directly to visitors through each camera's mic and speaker, often stopping incidents before they start — no staff intervention required.
+- LED lights and sirens: If needed, Dispatchers remotely trigger red/blue lights and sirens for added deterrence.
+- Authorities dispatched when necessary: Rare, since most people leave once they realize they're being watched.
+- AI motion detection and 360-degree tracking: Cuts false alarms and speeds up response times.
+- Cloud-based platform: Real-time alerts, 4K recordings, and incident reports available on request.
+
+See It In Action
+
+- Playlist: https://www.youtube.com/playlist?list=PL8zqosssgMP2F7EFKUYKEMdeBYvvVNwGR
+- Proactive Video Monitoring: https://www.youtube.com/watch?v=9ggR_hdPXNk
+- Property Crime in Seattle: https://www.youtube.com/watch?v=bc830vyv8wo
+- Website: https://www.sandrumonitoring.com/
+
+Next Steps
+
+1. Schedule a call or demo: ${sched}
+2. Questions? Just reply — we'll get back to you promptly.
+3. Ready to start? Visit ${signup} or https://sandrumonitoring.com/contact/
+
+Looking forward to helping keep ${property} safe.
+
+Warm regards,
+${name}
+${title}
+Sandru Monitoring
+${phone} | ${email} | https://www.sandrumonitoring.com/`;
+
+  v('output-text').value = body;
+  v('output-label').textContent = 'Generated email';
+  v('output-wrap').style.display = 'block';
+
+  const unfilled = Object.values(EMAIL_BLANKS).filter(ph => body.includes(ph));
+  const warn = v('em-warn');
+  if (unfilled.length) {
+    warn.textContent = 'Not ready to send — still contains: ' + unfilled.join(', ');
+    warn.classList.remove('hidden');
+  } else {
+    warn.classList.add('hidden');
+  }
 }
 
 // ── CHECKBOX QUANTITY ENABLE/DISABLE + AUTO LINE ITEM ──────────
@@ -1873,6 +2002,7 @@ function setGenerating(prefix, generating) {
 // ── GENERATE ─────────────────────────────────────────────────
 function generate(prefix) {
   if (!validateProposal(prefix)) return;
+  v('output-label').textContent = 'Generated proposal';
   const p = (window._prices || {})[prefix] || {};
 
   let data = {};
