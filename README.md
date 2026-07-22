@@ -4,7 +4,7 @@ An internal tool for Sandru Technologies that helps techs quickly build job prop
 
 ## How it works
 
-- **`public/index.html`** — the single-page app. Sign in with a Google account restricted to `@sandrutech.com`. Fill out job details across tabs (ButterflyMX, Camera, Doorking, Door Hardware, WiFi, Access Expansion). Checking a hardware/material box (with quantity) automatically adds a matching line item to that tab's pricing section — just fill in the price.
+- **`public/index.html`** — the single-page app. Sign in with a Google account restricted to `@sandrutech.com`. Fill out job details across tabs (ButterflyMX, Camera, Doorking, Door Hardware, Astragal Installation, WiFi, Access Expansion). Checking a hardware/material box (with quantity) automatically adds a matching line item to that tab's pricing section — just fill in the price.
 - **`functions/index.js`** — a Firebase Cloud Function (`generateProposal`) that verifies the signed-in user's Firebase ID token, checks their email domain, and forwards the built prompt to the Anthropic API to generate proposal text.
 - **`firebase.json`** — hosting config. Includes a rewrite so requests to `/api/generateProposal` on the hosting domain are forwarded to the Cloud Function, so the frontend never needs a hardcoded function URL.
 - **`public/404.html`** — default Firebase 404 page.
@@ -75,7 +75,7 @@ Only accounts on the `sandrutech.com` domain (verified + email-verified) can cal
 
 ## Local UI testing
 
-Run `node dev-server.js`, then open `http://localhost:8123/?testfill=1`. Test mode reveals the local UI, fills a realistic ButterflyMX job, and returns a local canned proposal for generation requests. It does not bypass authentication on the deployed site or live Cloud Function.
+Run `node dev-server.js`, then open `http://localhost:8123/?testfill=1` for a ButterflyMX test job or `http://localhost:8123/?testfill=astragal` for an astragal test job. Test mode reveals the local UI, fills realistic job data, and returns a local canned proposal for generation requests. It does not bypass authentication on the deployed site or live Cloud Function.
 
 ## Notes
 

@@ -22,16 +22,45 @@ const MIME = {
 // Holds the most recent /api/generateProposal exchange for test inspection
 let lastGeneration = null;
 
-// Test-mode script injected into index.html; runs only with ?testfill=1
+// Test-mode script injected into index.html; use ?testfill=1 or ?testfill=astragal
 const TEST_FILL_SCRIPT = `
 <script>
 (function () {
-  if (!location.search.includes("testfill=1")) return;
+  var testMode = new URLSearchParams(location.search).get("testfill");
+  if (!testMode) return;
   function fire(el, type) { el.dispatchEvent(new Event(type, { bubbles: true })); }
   function setVal(id, val) { const el = document.getElementById(id); if (!el) return; el.value = val; fire(el, "input"); fire(el, "change"); }
   function check(id) { const el = document.getElementById(id); if (!el || el.checked) return; el.checked = true; fire(el, "change"); el.click && el.checked === false && el.click(); }
+  function setQty(id, val) { const cb = document.getElementById(id); const qty = cb && cb.parentElement.querySelector(".cb-qty"); if (!qty) return; qty.value = val; fire(qty, "input"); fire(qty, "change"); }
   function fill() {
     window._currentIdToken = "local-test-token";
+    if (testMode === "astragal") {
+      if (typeof switchType === "function") switchType("astragal");
+      setVal("ast-company", "Test Property Management");
+      setVal("ast-contact", "Jane Doe");
+      setVal("ast-site", "Fremont Crossing");
+      setVal("ast-addr", "123 Fremont Ave N");
+      setVal("ast-zip", "Seattle, WA 98109");
+      check("ast-hw-0"); setQty("ast-hw-0", 3);
+      check("ast-hw-1"); setQty("ast-hw-1", 2);
+      setVal("ast-inswing", 1);
+      setVal("ast-outswing", 2);
+      setVal("ast-doors", "Office Door (In-Swing)\\nCommercial Lobby to Stairs (Outswing)\\nGarage Shop (Outswing)");
+      setVal("ast-notes", "Bulk quantity discount applied to materials and labor.");
+      setVal("ast-lhrs", 12);
+      setVal("ast-lrate", 160);
+      setTimeout(function () {
+        document.querySelectorAll("#ast-lineitems input[type=number]").forEach(function (inp) {
+          if (!inp.value || Number(inp.value) === 0) { inp.value = 500; fire(inp, "input"); fire(inp, "change"); }
+        });
+        if (typeof calcPrice === "function") calcPrice("ast");
+        var banner = document.createElement("div");
+        banner.textContent = "ASTRAGAL TEST DATA LOADED - click 'Generate proposal text'";
+        banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#b45309;color:#fff;padding:8px 14px;font:600 14px sans-serif;text-align:center;";
+        document.body.appendChild(banner);
+      }, 300);
+      return;
+    }
     setVal("bf-company", "Test Property Management");
     setVal("bf-contact", "Jane Doe");
     setVal("bf-site", "Cedar Ridge Apartments");

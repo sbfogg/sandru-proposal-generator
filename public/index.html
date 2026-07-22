@@ -301,6 +301,7 @@
   <button class="type-btn" onclick="switchType('camera')">📷 Camera System</button>
   <button class="type-btn" onclick="switchType('doorking')">🔧 Doorking Repair</button>
   <button class="type-btn" onclick="switchType('doorhardware')">🚪 Door Hardware</button>
+  <button class="type-btn" onclick="switchType('astragal')">🛡️ Astragal Installation</button>
   <button class="type-btn" onclick="switchType('wifi')">📶 WiFi / Networking</button>
   <button class="type-btn" onclick="switchType('accessexpansion')">🔑 Access Expansion</button>
 </div>
@@ -736,6 +737,98 @@
   <button class="generate-btn" onclick="generate('dh')">Generate proposal text →</button>
 </div>
 
+<!-- ===================== ASTRAGAL INSTALLATION ===================== -->
+<div id="type-astragal" class="hidden">
+  <p class="page-title">Astragal Installation</p>
+  <p class="page-sub">Full-door interlocking astragals, optional latch guards, and related door repairs.</p>
+
+  <div class="card">
+    <div class="card-title">Client & site</div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Company name</label><input type="text" id="ast-company" placeholder="e.g. Property management company"></div>
+      <div class="field"><label class="field-label">Primary contact</label><input type="text" id="ast-contact" placeholder="e.g. Property manager"></div>
+    </div>
+    <div class="field"><label class="field-label">CC contacts (optional)</label><input type="text" id="ast-cc" placeholder=""></div>
+    <div class="field"><label class="field-label">Property / building name</label><input type="text" id="ast-site" placeholder="e.g. Fremont Crossing"></div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Street address</label><input type="text" id="ast-addr" placeholder="e.g. 700 Broadway E"></div>
+      <div class="field"><label class="field-label">City, State ZIP</label><input type="text" id="ast-zip" placeholder="Seattle, WA 98102"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Astragal scope</div>
+    <div class="cb-list" id="ast-hw-list">
+      <div class="cb-row"><input type="checkbox" id="ast-hw-0" data-label="Full-Door Interlocking Astragal"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ast-hw-0">Full-Door Interlocking Astragals</label></div>
+      <div class="cb-row"><input type="checkbox" id="ast-hw-1" data-label="Latch Guard"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ast-hw-1">Latch Guards (optional)</label></div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="field"><label class="field-label">Known in-swing astragals (optional)</label><input type="number" id="ast-inswing" value="" min="0"></div>
+      <div class="field"><label class="field-label">Known out-swing astragals (optional)</label><input type="number" id="ast-outswing" value="" min="0"></div>
+    </div>
+    <p class="note-text">Leave both swing fields blank when the exact mix will be determined by the doors on site.</p>
+    <div class="field" style="margin-top:14px"><label class="field-label">Doors / installation locations (optional, one per line)</label><textarea id="ast-doors" placeholder="Office Door (In-Swing)&#10;Commercial Lobby to Stairs (Outswing)&#10;Garage Shop (Outswing)"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Related work (optional)</div>
+    <div class="field"><label class="field-label">Additional access-control or door repairs</label><textarea id="ast-repairs" placeholder="e.g. Repair access-control functionality on three doors and replace the failing maglock, power supply, and push-to-exit buttons"></textarea></div>
+    <div class="field">
+      <label class="field-label">Cabling for related repairs</label>
+      <select id="ast-cabling">
+        <option value="none">Not applicable</option>
+        <option value="reuse">Reuse existing cabling</option>
+        <option value="new">Run new cabling as required</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Special notes / customer-facing discount explanation</label><textarea id="ast-notes" placeholder="e.g. Bulk quantity discount applied to materials and labor"></textarea></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Additional hardware (optional)</div>
+    <div class="cb-list">
+      <div class="cb-row"><input type="checkbox" id="ast-hw-2" data-label="Slim Push-to-Exit Button w/ Timer"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ast-hw-2">Slim Push-to-Exit Button w/ Timer</label></div>
+      <div class="cb-row"><input type="checkbox" id="ast-hw-3" data-label="Power Supply w/ Backup Batteries"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ast-hw-3">Power Supply w/ Backup Batteries</label></div>
+      <div class="cb-row"><input type="checkbox" id="ast-hw-4" data-label="1200LB Maglock"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ast-hw-4">1200LB Maglock</label></div>
+      <div class="cb-row"><input type="checkbox" id="ast-hw-5" data-label="Regular Push-to-Exit Button w/ Timer"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ast-hw-5">Regular Push-to-Exit Button w/ Timer</label></div>
+      <div class="cb-row"><input type="checkbox" id="ast-hw-6" data-label="Electrified Door Strike"><input type="number" class="cb-qty" value="1" min="1" disabled><label class="cb-label" for="ast-hw-6">Electrified Door Strike</label></div>
+    </div>
+    <div id="ast-hw-custom"></div>
+    <button class="add-btn" onclick="addCustom('ast-hw-custom')">+ Add related repair hardware</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <div class="grid3">
+      <div class="field"><label class="field-label">Labor hours</label><input type="number" id="ast-lhrs" value="" oninput="calcPrice('ast')"></div>
+      <div class="field"><label class="field-label">Rate ($/hr)</label><input type="number" id="ast-lrate" value="" oninput="calcPrice('ast')"></div>
+      <div class="field"><label class="field-label">Labor discount %</label><input type="number" id="ast-ldisc" value="0" min="0" max="100" oninput="calcPrice('ast')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Materials line items</label>
+        <div class="line-items" id="ast-lineitems"></div>
+        <button type="button" class="add-btn" onclick="addLineItem('ast')">+ Add line item</button>
+        <p class="note-text">Astragals and latch guards selected above are added automatically. Enter each line's combined price.</p>
+      </div>
+      <div class="field"><label class="field-label">Materials cost ($)</label><input type="number" id="ast-mcost" value="" oninput="calcPrice('ast')"></div>
+      <div class="field"><label class="field-label">Materials discount %</label><input type="number" id="ast-mdisc" value="0" min="0" max="100" oninput="calcPrice('ast')"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="field-label">Overall discount %</label><input type="number" id="ast-odisc" value="0" min="0" max="100" oninput="calcPrice('ast')"></div>
+      <div class="field"><label class="field-label">Sales tax</label>
+        <select id="ast-tax" onchange="calcPrice('ast')">
+          <option value="yes">Yes — 10.55%</option>
+          <option value="no">No (tax exempt)</option>
+        </select>
+      </div>
+    </div>
+    <table class="price-table" id="ast-price-table"></table>
+  </div>
+
+  <button class="generate-btn" onclick="generate('ast')">Generate proposal text →</button>
+</div>
+
 <!-- ===================== WIFI / NETWORKING ===================== -->
 <div id="type-wifi" class="hidden">
   <p class="page-title">WiFi / Networking</p>
@@ -1164,6 +1257,18 @@ NEVER USE: #, ##, **double asterisks for bold**, numbered lists, | pipe tables, 
 
 LINKS: Quotient renders a link written as "Link Text":https://url — the visible label in straight double quotes, immediately followed by a colon and the raw URL with NO space. Do NOT use Markdown link syntax [text](url). Reproduce the four Sandru Monitoring links exactly as given in the Why Video Monitoring? section; to bold the first link, wrap the whole "text":url in single asterisks (*"...":https://...*).
 
+ASTRAGAL INSTALLATIONS — additional rules (apply when TYPE is Astragal Installation; these override the general system-opening rules wherever they conflict):
+   - Title: "*Full-Door Interlocking Astragal Installation for [Property Name]*". When related access-control repairs are included, use "*Door Hardware Repairs + Astragal Installation for [Property Name]*".
+   - Open Scope of Work with "* Install a number of astragals on site at [Property Name]" (or name the related repairs in the same opening bullet when provided), followed by "* Sandru Technologies will install a total of [N] astragals on site".
+   - Then use "* Provide and install [N] Full-Door Interlocking Astragals for this deployment". If exact door locations are supplied, follow this with the lead bullet "* These astragals will be installed on the following doors:" and put every supplied door/location on its own consecutive "** " sub-bullet. Preserve supplied in-swing/out-swing labels.
+   - If the swing mix is unknown, add the consecutive sub-bullet "** These will be either in-swing or out-swing models (depending on the door)". If exact in-swing and out-swing counts are supplied, state the actual breakdown in a "** " sub-bullet instead.
+   - When latch guards are included, add "* Provide and install [N] Latch Guards for this deployment".
+   - Include related access-control repairs and their hardware only when supplied in the job data. Apply the normal cabling-reuse/new-cabling wording only when CABLING is not "Not applicable".
+   - Close the scope in this order: configure the newly installed astragals and latch guards as required (mention only included items); test all hardware and the entire system for functionality; then "* Customer training on their newly upgraded doors". This customer-training scope bullet is an explicit exception to the general non-camera rule above.
+   - Notes must include "* *These astragals will be either in-swing or out-swing models*" with nested "** This is dependent on the door that these are being installed for" when the mix is unknown. Use the exact known swing breakdown instead when supplied. Include customer-facing discount explanations only when present in SPECIAL NOTES; do not infer a discount from pricing fields alone.
+   - Materials must include the astragals, latch guards, related repair hardware, and other miscellaneous materials actually supplied in the job data, followed by the exact Total Materials figure. Labor follows the standard labor-category list and exact Total Labor figure.
+   - NEVER write "see attached pictures", "please see the attached pictures", or any other reference to attached pictures/photos. The user will add picture references manually when desired.
+
 TOTALS: The proposal shows only two dollar figures, each as plain text on its own line directly beneath its section's bulleted list — nothing else. Example:
 Total Materials: $5,000.00
 Total Labor: $1,280.00
@@ -1187,8 +1292,8 @@ const STORAGE_KEYS = {
   templates: 'sandruProposalTemplatesV1',
   history: 'sandruProposalHistoryV1'
 };
-const PREFIX_TO_TYPE = {bf:'butterfly',cam:'camera',dk:'doorking',dh:'doorhardware',wifi:'wifi',ax:'accessexpansion'};
-const TYPE_LABELS = {butterfly:'ButterflyMX',camera:'Camera System',doorking:'Doorking Repair',doorhardware:'Door Hardware',wifi:'WiFi / Networking',accessexpansion:'Access Expansion'};
+const PREFIX_TO_TYPE = {bf:'butterfly',cam:'camera',dk:'doorking',dh:'doorhardware',ast:'astragal',wifi:'wifi',ax:'accessexpansion'};
+const TYPE_LABELS = {butterfly:'ButterflyMX',camera:'Camera System',doorking:'Doorking Repair',doorhardware:'Door Hardware',astragal:'Astragal Installation',wifi:'WiFi / Networking',accessexpansion:'Access Expansion'};
 let currentType = 'butterfly';
 let autosaveTimer = null;
 let isRestoringState = false;
@@ -1234,7 +1339,7 @@ function serializeWorkspace() {
   });
 
   const lineItems = {};
-  ['bf','cam','dk','dh','wifi','ax'].forEach(prefix => {
+  ['bf','cam','dk','dh','ast','wifi','ax'].forEach(prefix => {
     const container = v(prefix + '-lineitems');
     lineItems[prefix] = container ? Array.from(container.querySelectorAll('.line-item-row')).map(row => ({
       name: row.querySelector('input[type=text]')?.value || '',
@@ -1266,7 +1371,7 @@ function restoreWorkspace(snapshot) {
       values.forEach(value => addCustom(containerId, value));
     });
     Object.keys(checkboxLineItemRows).forEach(key => delete checkboxLineItemRows[key]);
-    ['bf','cam','dk','dh','wifi','ax'].forEach(prefix => {
+    ['bf','cam','dk','dh','ast','wifi','ax'].forEach(prefix => {
       const container = v(prefix + '-lineitems');
       if (container) container.innerHTML = '';
       (snapshot.lineItems?.[prefix] || []).forEach(item => createLineItemRow(prefix, item.name, item.price, item.checkboxId));
@@ -1276,7 +1381,7 @@ function restoreWorkspace(snapshot) {
     onBmxSupplyChange();
     // Reapply explicitly entered material totals after line-item reconstruction;
     // users are allowed to override the calculated line-item sum.
-    ['bf','cam','dk','dh','wifi','ax'].forEach(prefix => {
+    ['bf','cam','dk','dh','ast','wifi','ax'].forEach(prefix => {
       const savedMaterials = snapshot.controls[prefix + '-mcost'];
       if (savedMaterials !== undefined && v(prefix + '-mcost')) v(prefix + '-mcost').value = savedMaterials;
       calcPrice(prefix);
@@ -1419,7 +1524,7 @@ function deleteHistoryItem(id) {
 }
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
-const types = ['butterfly','camera','doorking','doorhardware','wifi','accessexpansion'];
+const types = ['butterfly','camera','doorking','doorhardware','astragal','wifi','accessexpansion'];
 function switchType(t) {
   currentType = t;
   types.forEach(id => {
@@ -1432,7 +1537,7 @@ function switchType(t) {
   scheduleAutosave();
 }
 function prefixFor(t) {
-  return {butterfly:'bf',camera:'cam',doorking:'dk',doorhardware:'dh',wifi:'wifi',accessexpansion:'ax'}[t];
+  return {butterfly:'bf',camera:'cam',doorking:'dk',doorhardware:'dh',astragal:'ast',wifi:'wifi',accessexpansion:'ax'}[t];
 }
 
 // ── CHECKBOX QUANTITY ENABLE/DISABLE + AUTO LINE ITEM ──────────
@@ -1679,6 +1784,7 @@ function validateProposal(prefix) {
     cam: ['cam-company','cam-contact','cam-site','cam-addr','cam-zip','cam-total','cam-lhrs','cam-lrate'],
     dk: ['dk-company','dk-contact','dk-site','dk-addr','dk-zip','dk-reason','dk-lhrs','dk-lrate'],
     dh: ['dh-company','dh-contact','dh-site','dh-addr','dh-zip','dh-scope','dh-lhrs','dh-lrate'],
+    ast: ['ast-company','ast-contact','ast-site','ast-addr','ast-zip','ast-lhrs','ast-lrate'],
     wifi: ['wifi-company','wifi-contact','wifi-site','wifi-addr','wifi-zip','wifi-aps','wifi-lhrs','wifi-lrate'],
     ax: ['ax-company','ax-contact','ax-site','ax-addr','ax-zip','ax-doors','ax-lhrs','ax-lrate']
   };
@@ -1705,6 +1811,24 @@ function validateProposal(prefix) {
   if (prefix === 'cam' && v('cam-monitoring')?.checked) {
     if (num('cam-mon-count') <= 0) addError('Monitoring camera count is required.', v('cam-mon-count'));
     if (num('cam-mon-rate') <= 0) addError('Monitoring rate is required.', v('cam-mon-rate'));
+  }
+  if (prefix === 'ast') {
+    const astragalCheckbox = v('ast-hw-0');
+    const astragalQty = parseInt(astragalCheckbox?.parentElement.querySelector('.cb-qty')?.value) || 0;
+    if (!astragalCheckbox?.checked || astragalQty <= 0) {
+      addError('Select Full-Door Interlocking Astragals and enter the installation quantity.', astragalCheckbox);
+    }
+    const inSwingText = val('ast-inswing');
+    const outSwingText = val('ast-outswing');
+    const inSwing = num('ast-inswing');
+    const outSwing = num('ast-outswing');
+    if ((inSwingText || outSwingText) && inSwing + outSwing !== astragalQty) {
+      addError('Known in-swing and out-swing quantities must add up to the total astragal quantity.', v('ast-inswing'));
+      v('ast-outswing')?.classList.add('field-invalid');
+    }
+    if (val('ast-repairs') && val('ast-cabling') === 'none') {
+      addError('Choose the cabling approach for the related repair work.', v('ast-cabling'));
+    }
   }
 
   ['ldisc','mdisc','odisc'].forEach(suffix => {
@@ -1836,6 +1960,44 @@ SPECIAL NOTES:${val('dh-notes')||'none'}
 TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
 TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
 
+  } else if (prefix === 'ast') {
+    const hardware = [];
+    document.querySelectorAll('[id^="ast-hw-"]').forEach(cb => {
+      if (cb.type === 'checkbox' && cb.checked) {
+        const qty = parseInt(cb.parentElement.querySelector('.cb-qty')?.value) || 1;
+        hardware.push({ label: cb.dataset.label, qty });
+      }
+    });
+    document.querySelectorAll('#ast-hw-custom input[type=text]').forEach(inp => {
+      if (inp.value.trim()) hardware.push({ label: inp.value.trim(), qty: 1 });
+    });
+    const astragalQty = parseInt(v('ast-hw-0')?.parentElement.querySelector('.cb-qty')?.value) || 0;
+    const latchQty = v('ast-hw-1')?.checked ? (parseInt(v('ast-hw-1').parentElement.querySelector('.cb-qty')?.value) || 0) : 0;
+    const inSwingText = val('ast-inswing');
+    const outSwingText = val('ast-outswing');
+    const swingBreakdown = (inSwingText || outSwingText)
+      ? `${num('ast-inswing')} in-swing; ${num('ast-outswing')} out-swing`
+      : 'Unknown — models depend on the doors where they are installed';
+    const cabling = {
+      none: 'Not applicable',
+      reuse: 'Reuse existing cabling for related repair work',
+      new: 'Run new cabling as required for related repair work'
+    }[val('ast-cabling')] || 'Not applicable';
+
+    prompt = PROMPT_HEADER + `GENERATE_PROPOSAL|TYPE:Astragal Installation
+CLIENT:${val('ast-company')}|CONTACT:${val('ast-contact')}|CC:${val('ast-cc')||'none'}
+SITE:${val('ast-site')}|ADDRESS:${val('ast-addr')}, ${val('ast-zip')}
+ASTRAGALS:${numWord(astragalQty)} Full-Door Interlocking Astragals
+SWING BREAKDOWN:${swingBreakdown}
+DOORS / INSTALLATION LOCATIONS:${val('ast-doors')||'not specified'}
+LATCH GUARDS:${latchQty ? numWord(latchQty)+' Latch Guards' : 'none'}
+RELATED ACCESS-CONTROL OR DOOR REPAIRS:${val('ast-repairs')||'none'}
+CABLING:${cabling}
+HARDWARE:${hardware.map(i=>numWord(i.qty)+' '+i.label).join('; ')||'none'}
+SPECIAL NOTES:${val('ast-notes')||'none'}
+TOTAL MATERIALS:${fmt(p.matsNet||p.m||0)}
+TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
+
   } else if (prefix === 'wifi') {
     const hwItems = [];
     document.querySelectorAll('[id^="wifi-hw-"]').forEach(cb => {
@@ -1944,7 +2106,7 @@ document.querySelector('main').addEventListener('change', event => {
 });
 
 // ── INIT ALL PRICE TABLES ─────────────────────────────────────
-['bf','cam','dk','dh','wifi','ax'].forEach(calcPrice);
+['bf','cam','dk','dh','ast','wifi','ax'].forEach(calcPrice);
 syncConditionalFields();
 renderTemplates();
 renderHistory();
