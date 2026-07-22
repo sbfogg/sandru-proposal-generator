@@ -264,11 +264,27 @@
   .history-meta { font-size: 12px; color: var(--gray-400); }
   .history-actions { display: flex; gap: 6px; flex-shrink: 0; }
   .history-actions .secondary-btn { padding: 6px 9px; }
+  .ai-fill-card { border-color: #b7cbea; background: linear-gradient(135deg, #f8fbff, #fff); }
+  .ai-fill-card textarea { min-height: 130px; }
+  .ai-fill-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .ai-fill-status { color: var(--gray-600); font-size: 13px; }
+  .ai-fill-status.error { color: var(--red); }
+  .ai-preview { margin-top: 14px; border-top: 1px solid var(--gray-200); padding-top: 14px; }
+  .ai-preview-summary { font-size: 13px; color: var(--gray-600); margin-bottom: 10px; }
+  .ai-preview-list { display: grid; gap: 7px; margin-bottom: 12px; }
+  .ai-preview-item { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(180px, 1.2fr) auto; gap: 10px; align-items: start; padding: 8px 10px; background: white; border: 1px solid var(--gray-100); border-radius: var(--radius); font-size: 13px; }
+  .ai-confidence { border-radius: 999px; padding: 2px 7px; font-size: 11px; text-transform: uppercase; }
+  .ai-confidence.high { background: #e8f6ed; color: #287a43; }
+  .ai-confidence.medium { background: #fff3d6; color: #8a5b00; }
+  .ai-confidence.low { background: #fff0ee; color: var(--red-dark); }
+  .ai-warnings { background: #fff8e8; border: 1px solid #efd18b; border-radius: var(--radius); padding: 10px 12px; margin-bottom: 12px; font-size: 13px; }
+  .ai-warnings ul { margin: 5px 0 0 18px; }
   @media (max-width: 600px) {
     .workspace-tools-top { align-items: flex-start; flex-direction: column; }
     .workspace-actions { grid-template-columns: 1fr 1fr; }
     .workspace-actions #template-name, .workspace-actions select { grid-column: 1 / -1; }
     .history-item { align-items: flex-start; flex-direction: column; }
+    .ai-preview-item { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -321,6 +337,26 @@
     <button type="button" class="secondary-btn" onclick="saveTemplate()">Save template</button>
     <button type="button" class="secondary-btn" onclick="loadSelectedTemplate()">Load template</button>
     <button type="button" class="secondary-btn danger" onclick="deleteSelectedTemplate()">Delete</button>
+  </div>
+</section>
+
+<section class="card ai-fill-card" aria-label="AI form fill">
+  <div class="card-title">AI Fill from email or job notes</div>
+  <p class="note-text">Paste customer emails, technician notes, or a job description. AI will prepare a review; it will not change the form until you approve.</p>
+  <textarea id="ai-source" maxlength="25000" placeholder="Paste the source information here…"></textarea>
+  <div class="ai-fill-actions">
+    <button type="button" class="secondary-btn" id="ai-analyze-btn" onclick="analyzeForFormFill()">Analyze and preview</button>
+    <button type="button" class="secondary-btn" onclick="clearAiFill()">Clear</button>
+    <span id="ai-fill-status" class="ai-fill-status" aria-live="polite"></span>
+  </div>
+  <div id="ai-preview" class="ai-preview hidden">
+    <div id="ai-preview-summary" class="ai-preview-summary"></div>
+    <div id="ai-warnings" class="ai-warnings hidden"></div>
+    <div id="ai-preview-list" class="ai-preview-list"></div>
+    <div class="ai-fill-actions">
+      <button type="button" class="generate-btn" onclick="applyAiFill()">Approve and fill form</button>
+      <button type="button" class="secondary-btn" onclick="discardAiPreview()">Discard preview</button>
+    </div>
   </div>
 </section>
 
@@ -1140,6 +1176,7 @@ setInterval(async () => {
 // After `firebase deploy`, the CLI prints the Function URL — paste it here.
 // Example: https://us-central1-sandru-proposal-generator.cloudfunctions.net/generateProposal
 const GENERATE_PROPOSAL_URL = '/api/generateProposal';
+const EXTRACT_PROPOSAL_DATA_URL = '/api/extractProposalData';
 // ─────────────────────────────────────────────────────────────
 
 // ── SHARED UTILITIES ──────────────────────────────────────────
@@ -1327,6 +1364,195 @@ function v(id) { return document.getElementById(id); }
 function val(id) { return (v(id) ? v(id).value.trim() : ''); }
 function num(id) { return parseFloat(v(id)?.value) || 0; }
 
+let pendingAiExtraction = null;
+
+function formControlLabel(control) {
+  const rowLabel = control.closest('.cb-row')?.querySelector('.cb-label');
+  const fieldLabel = control.closest('.field')?.querySelector('.field-label');
+  return (rowLabel?.textContent || fieldLabel?.textContent || control.getAttribute('aria-label') || control.id).trim();
+}
+
+function buildFormSchema() {
+  return types.flatMap(proposalType => {
+    const root = v('type-' + proposalType);
+    if (!root) return [];
+    return Array.from(root.querySelectorAll('input[id], select[id], textarea[id]'))
+      .filter(control => !['button','submit','hidden'].includes(control.type))
+      .map(control => ({
+        id: control.id,
+        proposalType,
+        label: formControlLabel(control),
+        inputType: control.type || control.tagName.toLowerCase(),
+        options: control.tagName === 'SELECT'
+          ? Array.from(control.options).map(option => option.value + ': ' + option.textContent.trim())
+          : []
+      }));
+  });
+}
+
+function controlBelongsToType(control, proposalType) {
+  return Boolean(control && control.closest('#type-' + proposalType));
+}
+
+function normalizeAiExtraction(raw) {
+  const proposalType = types.includes(raw?.proposalType) ? raw.proposalType : '';
+  if (!proposalType) throw new Error('AI could not identify a supported proposal type.');
+  const fields = Array.isArray(raw.fields) ? raw.fields.filter(item => {
+    const control = v(item.id);
+    return controlBelongsToType(control, proposalType) && control.type !== 'checkbox' && ['string','number'].includes(typeof item.value);
+  }) : [];
+  const checkboxes = Array.isArray(raw.checkboxes) ? raw.checkboxes.filter(item => {
+    const control = v(item.id);
+    return controlBelongsToType(control, proposalType) && control.type === 'checkbox' && typeof item.checked === 'boolean';
+  }) : [];
+  return {
+    proposalType,
+    fields,
+    checkboxes,
+    warnings: Array.isArray(raw.warnings) ? raw.warnings.map(String).slice(0, 30) : []
+  };
+}
+
+function previewItem(label, value, confidence, evidence) {
+  const row = document.createElement('div');
+  row.className = 'ai-preview-item';
+  const name = document.createElement('strong'); name.textContent = label;
+  const proposed = document.createElement('span'); proposed.textContent = String(value);
+  if (evidence) proposed.title = 'Source: ' + evidence;
+  const badge = document.createElement('span');
+  badge.className = 'ai-confidence ' + (['high','medium','low'].includes(confidence) ? confidence : 'low');
+  badge.textContent = confidence || 'low';
+  row.append(name, proposed, badge);
+  return row;
+}
+
+function renderAiPreview(extraction) {
+  const list = v('ai-preview-list');
+  list.innerHTML = '';
+  extraction.fields.forEach(item => list.appendChild(previewItem(formControlLabel(v(item.id)), item.value, item.confidence, item.evidence)));
+  extraction.checkboxes.forEach(item => {
+    const value = item.checked ? 'Selected' + (item.quantity ? ' × ' + item.quantity : '') : 'Not selected';
+    list.appendChild(previewItem(formControlLabel(v(item.id)), value, item.confidence, item.evidence));
+  });
+  if (!extraction.fields.length && !extraction.checkboxes.length) {
+    const empty = document.createElement('p'); empty.className = 'note-text'; empty.textContent = 'No supported form values were found.';
+    list.appendChild(empty);
+  }
+
+  v('ai-preview-summary').textContent = 'Detected form: ' + TYPE_LABELS[extraction.proposalType] + '. Review ' + (extraction.fields.length + extraction.checkboxes.length) + ' proposed changes.';
+  const warnings = v('ai-warnings');
+  warnings.innerHTML = '';
+  if (extraction.warnings.length) {
+    const title = document.createElement('strong'); title.textContent = 'Review these uncertainties';
+    const ul = document.createElement('ul');
+    extraction.warnings.forEach(text => { const li = document.createElement('li'); li.textContent = text; ul.appendChild(li); });
+    warnings.append(title, ul);
+    warnings.classList.remove('hidden');
+  } else {
+    warnings.classList.add('hidden');
+  }
+  v('ai-preview').classList.remove('hidden');
+}
+
+async function analyzeForFormFill() {
+  const sourceText = val('ai-source');
+  const status = v('ai-fill-status');
+  const button = v('ai-analyze-btn');
+  status.classList.remove('error');
+  if (sourceText.length < 20) {
+    status.textContent = 'Paste at least 20 characters of job information.';
+    status.classList.add('error');
+    v('ai-source').focus();
+    return;
+  }
+  if (!window._currentIdToken) {
+    status.textContent = 'Please refresh and sign in again.';
+    status.classList.add('error');
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'Analyzing…';
+  status.textContent = 'Extracting only information supported by the source…';
+  discardAiPreview();
+  try {
+    const response = await fetch(EXTRACT_PROPOSAL_DATA_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + window._currentIdToken
+      },
+      body: JSON.stringify({ sourceText, formSchema: buildFormSchema() })
+    });
+    const raw = await response.text();
+    let data;
+    try { data = JSON.parse(raw); }
+    catch { data = { error: raw ? raw.slice(0, 240) : ('HTTP ' + response.status) }; }
+    if (!response.ok) throw new Error(data.error || ('HTTP ' + response.status));
+    pendingAiExtraction = normalizeAiExtraction(data.extraction);
+    renderAiPreview(pendingAiExtraction);
+    status.textContent = 'Preview ready. Nothing has been changed yet.';
+  } catch (err) {
+    status.textContent = 'AI Fill error: ' + (err?.message || err);
+    status.classList.add('error');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Analyze and preview';
+  }
+}
+
+function applyAiFill() {
+  if (!pendingAiExtraction) return;
+  const extraction = pendingAiExtraction;
+  isRestoringState = true;
+  try {
+    switchType(extraction.proposalType);
+    extraction.fields.forEach(item => {
+      const control = v(item.id);
+      if (!controlBelongsToType(control, extraction.proposalType)) return;
+      if (control.tagName === 'SELECT' && !Array.from(control.options).some(option => option.value === String(item.value))) return;
+      control.value = item.value;
+      control.dispatchEvent(new Event('input', { bubbles: true }));
+      control.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    extraction.checkboxes.forEach(item => {
+      const checkbox = v(item.id);
+      if (!controlBelongsToType(checkbox, extraction.proposalType)) return;
+      checkbox.checked = item.checked;
+      const quantity = checkbox.parentElement?.querySelector('.cb-qty');
+      if (quantity && item.checked) quantity.value = Math.max(1, Number(item.quantity) || 1);
+      if (quantity) quantity.disabled = !item.checked;
+      checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    toggleMonitoring();
+    onBmxSupplyChange();
+    syncConditionalFields();
+    const prefix = prefixFor(extraction.proposalType);
+    if (prefix) calcPrice(prefix);
+    if (extraction.proposalType === 'email') buildEmail();
+    clearValidation();
+  } finally {
+    isRestoringState = false;
+  }
+  scheduleAutosave();
+  v('ai-fill-status').textContent = 'Form filled. Review highlighted uncertainties and complete any missing details.';
+  discardAiPreview(false);
+  v('type-' + extraction.proposalType).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function discardAiPreview(clearStatus = true) {
+  pendingAiExtraction = null;
+  v('ai-preview').classList.add('hidden');
+  v('ai-preview-list').innerHTML = '';
+  if (clearStatus) v('ai-fill-status').textContent = '';
+}
+
+function clearAiFill() {
+  v('ai-source').value = '';
+  discardAiPreview();
+  v('ai-source').focus();
+}
+
 const STORAGE_KEYS = {
   draft: 'sandruProposalDraftV1',
   templates: 'sandruProposalTemplatesV1',
@@ -1363,7 +1589,7 @@ function writeStorage(key, value) {
 function serializeWorkspace() {
   const controls = {};
   document.querySelectorAll('main input[id], main select[id], main textarea[id]').forEach(el => {
-    if (el.id === 'output-text' || el.id === 'template-select' || el.id === 'template-name') return;
+    if (['output-text','template-select','template-name','ai-source'].includes(el.id)) return;
     controls[el.id] = el.type === 'checkbox' ? el.checked : el.value;
   });
 

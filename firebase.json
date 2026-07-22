@@ -27,6 +27,13 @@
           "functionId": "generateProposal",
           "region": "us-central1"
         }
+      },
+      {
+        "source": "/api/extractProposalData",
+        "function": {
+          "functionId": "extractProposalData",
+          "region": "us-central1"
+        }
       }
     ]
   }
