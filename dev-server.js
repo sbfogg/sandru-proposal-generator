@@ -34,6 +34,10 @@ const TEST_FILL_SCRIPT = `
   function setQty(id, val) { const cb = document.getElementById(id); const qty = cb && cb.parentElement.querySelector(".cb-qty"); if (!qty) return; qty.value = val; fire(qty, "input"); fire(qty, "change"); }
   function fill() {
     window._currentIdToken = "local-test-token";
+    if (testMode === "aifill") {
+      setVal("ai-source", 'Install twenty-six (26) ButterflyMX Standard Card Readers and two (2) Black PVC Boards.');
+      return;
+    }
     if (testMode === "astragal") {
       if (typeof switchType === "function") switchType("astragal");
       setVal("ast-company", "Test Property Management");
@@ -95,12 +99,21 @@ const TEST_FILL_SCRIPT = `
   if (gate) gate.classList.add("hidden");
   if (localApp) localApp.classList.remove("hidden");
 
-  // Wait until the app UI is available, then populate a realistic job.
+  // Firebase auth may update after this injected script runs. Keep the local
+  // test UI visible long enough for that callback to settle, but fill only once.
+  var filled = false;
+  var attempts = 0;
   var t = setInterval(function () {
     var app = document.getElementById("app-wrap");
     if (gate) gate.classList.add("hidden");
     if (app) app.classList.remove("hidden");
-    if (app && !app.classList.contains("hidden")) { clearInterval(t); fill(); }
+    window._currentIdToken = "local-test-token";
+    if (app && !app.classList.contains("hidden") && !filled) {
+      filled = true;
+      fill();
+    }
+    attempts += 1;
+    if (attempts >= 20) clearInterval(t);
   }, 500);
 })();
 </scr` + `ipt>`;
@@ -125,6 +138,34 @@ const server = http.createServer(async (req, res) => {
         try { prompt = JSON.parse(reqBody.toString("utf8")).prompt; } catch {}
         const responseJson = { text: "Local test proposal generated successfully." };
         lastGeneration = { time: new Date().toISOString(), status: 200, prompt, response: responseJson };
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(responseJson));
+        return;
+      }
+      if (url.pathname === "/api/extractProposalData" && req.headers.authorization === "Bearer local-test-token") {
+        const responseJson = {
+          extraction: {
+            proposalType: "butterfly",
+            fields: [],
+            checkboxes: [
+              {
+                id: "bf-bmx-4",
+                checked: true,
+                quantity: 26,
+                confidence: "high",
+                evidence: "twenty-six (26) ButterflyMX Standard Card Readers"
+              },
+              {
+                id: "bf-mat-0",
+                checked: true,
+                quantity: 2,
+                confidence: "high",
+                evidence: "two (2) Black PVC Boards"
+              }
+            ],
+            warnings: []
+          }
+        };
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(responseJson));
         return;

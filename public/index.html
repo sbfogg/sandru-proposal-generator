@@ -1381,8 +1381,10 @@ function buildFormSchema() {
       .map(control => ({
         id: control.id,
         proposalType,
+        section: control.closest('.card')?.querySelector('.card-title')?.textContent.trim() || '',
         label: formControlLabel(control),
         inputType: control.type || control.tagName.toLowerCase(),
+        supportsQuantity: control.type === 'checkbox' && Boolean(control.parentElement?.querySelector('.cb-qty')),
         options: control.tagName === 'SELECT'
           ? Array.from(control.options).map(option => option.value + ': ' + option.textContent.trim())
           : []

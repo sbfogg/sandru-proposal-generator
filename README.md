@@ -76,7 +76,7 @@ Only accounts on the `sandrutech.com` domain (verified + email-verified) can cal
 
 ## Local UI testing
 
-Run `node dev-server.js`, then open `http://localhost:8123/?testfill=1` for a ButterflyMX test job or `http://localhost:8123/?testfill=astragal` for an astragal test job. Test mode reveals the local UI, fills realistic job data, and returns a local canned proposal for generation requests. It does not bypass authentication on the deployed site or live Cloud Function.
+Run `node dev-server.js`, then open `http://localhost:8123/?testfill=1` for a ButterflyMX test job, `http://localhost:8123/?testfill=astragal` for an astragal test job, or `http://localhost:8123/?testfill=aifill` for a deterministic AI Fill checkbox-and-quantity test. Test mode reveals the local UI, fills realistic job data, and returns local canned responses for the supported test request. It does not bypass authentication on the deployed site or live Cloud Function.
 
 ## Notes
 
