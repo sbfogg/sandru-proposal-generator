@@ -35,7 +35,7 @@ const TEST_FILL_SCRIPT = `
   function fill() {
     window._currentIdToken = "local-test-token";
     if (testMode === "aifill") {
-      setVal("ai-source", 'Install twenty-six (26) ButterflyMX Standard Card Readers and two (2) Black PVC Boards.');
+      setVal("ai-source", 'Replace two existing call boxes with two ButterflyMX intercoms.');
       return;
     }
     if (testMode === "astragal") {
@@ -136,7 +136,28 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === "/api/generateProposal" && req.headers.authorization === "Bearer local-test-token") {
         let prompt = null;
         try { prompt = JSON.parse(reqBody.toString("utf8")).prompt; } catch {}
-        const responseJson = { text: "Local test proposal generated successfully." };
+        const responseJson = { text: `*ButterflyMX Access Control Installation for Cedar Ridge Apartments*
+
+*Job Site*
+Cedar Ridge Apartments
+1234 Main St
+Bellevue, WA 98004
+
+*Scope of Work*
+* Remove the existing DoorKing call box and install the new ButterflyMX intercom.
+* Test the completed system for functionality.
+
+*Materials*
+* Black PVC Board
+* Cabling, Conduit, Connectors, Cable Support
+Total Materials: $300.00
+
+*Labor*
+* Installation and programming labor
+Total Labor: $1,280.00
+
+*Terms and Conditions*
+* Standard Sandru Technologies terms apply.` };
         lastGeneration = { time: new Date().toISOString(), status: 200, prompt, response: responseJson };
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(responseJson));
@@ -148,6 +169,13 @@ const server = http.createServer(async (req, res) => {
             proposalType: "butterfly",
             fields: [],
             checkboxes: [
+              {
+                id: "bf-bmx-2",
+                checked: true,
+                quantity: 2,
+                confidence: "medium",
+                evidence: "two ButterflyMX intercoms; the recessed mounting default applies"
+              },
               {
                 id: "bf-bmx-4",
                 checked: true,

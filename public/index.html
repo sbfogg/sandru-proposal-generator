@@ -1076,6 +1076,7 @@
   <label class="field-label" id="output-label">Generated proposal</label>
   <textarea id="output-text" readonly style="width:100%; min-height:300px; font-family:monospace; white-space:pre-wrap;"></textarea>
   <button class="generate-btn" id="copy-btn" onclick="copyOutput()">Copy to Clipboard</button>
+  <div id="quotient-sections" class="hidden" style="margin-top:16px;"></div>
 </div>
 
 <section class="card history-card">
@@ -1780,6 +1781,7 @@ function openHistoryItem(id) {
   if (!item) return;
   restoreWorkspace(item.snapshot);
   v('output-text').value = item.text || '';
+  renderQuotientSections(item.text || '');
   v('output-wrap').style.display = '';
   writeStorage(STORAGE_KEYS.draft, serializeWorkspace());
   v('output-wrap').scrollIntoView({behavior:'smooth', block:'start'});
@@ -1885,6 +1887,7 @@ ${phone} | ${email} | https://www.sandrumonitoring.com/`;
 
   v('output-text').value = body;
   v('output-label').textContent = 'Generated email';
+  renderQuotientSections('');
   v('output-wrap').style.display = 'block';
 
   const unfilled = Object.values(EMAIL_BLANKS).filter(ph => body.includes(ph));
@@ -2426,11 +2429,13 @@ TOTAL LABOR:${fmt(p.laborNet||p.laborGross||0)}`;
     })
     .then(data => {
       outText.value = data.text;
+      renderQuotientSections(data.text);
       addProposalToHistory(prefix, data.text);
       scheduleAutosave();
     })
     .catch(err => {
       outText.value = 'Error generating proposal: ' + (err && err.message ? err.message : err);
+      renderQuotientSections('');
     })
     .finally(() => setGenerating(prefix, false));
 }
@@ -2444,6 +2449,75 @@ function copyOutput() {
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = orig; }, 1500);
   });
+}
+
+// Quotient uses separate rich-text fields. Split the approved proposal into
+// independently copyable sections instead of relying on fragile tab-paste behavior.
+const QUOTIENT_SECTION_HEADINGS = [
+  'Job Site', 'Scope of Work', 'Notes', 'Materials', 'Labor',
+  'Important Notice About Hardware Pricing', 'Terms and Conditions',
+  'Payment Terms', 'Notes and Exclusions'
+];
+
+function splitProposalForQuotient(text) {
+  const normalized = String(text || '').replace(/\r\n/g, '\n').trim();
+  if (!normalized) return [];
+  const matcher = new RegExp('^\\s*\\*?(' + QUOTIENT_SECTION_HEADINGS.join('|') + ')\\*?\\s*$', 'gmi');
+  const matches = [...normalized.matchAll(matcher)];
+  if (!matches.length) return [];
+
+  const title = normalized.slice(0, matches[0].index).trim();
+  const sections = title ? [{ label: 'Proposal title', text: title }] : [];
+  matches.forEach((match, index) => {
+    const start = match.index + match[0].length;
+    const end = index + 1 < matches.length ? matches[index + 1].index : normalized.length;
+    const content = normalized.slice(start, end).trim();
+    if (content) sections.push({ label: match[1], text: content });
+  });
+  return sections;
+}
+
+function copyQuotientSection(text, button) {
+  navigator.clipboard.writeText(text).then(() => {
+    const original = button.textContent;
+    button.textContent = 'Copied!';
+    setTimeout(() => { button.textContent = original; }, 1500);
+  });
+}
+
+function renderQuotientSections(text) {
+  const container = v('quotient-sections');
+  if (!container) return;
+  container.innerHTML = '';
+  const sections = splitProposalForQuotient(text);
+  if (!sections.length) {
+    container.classList.add('hidden');
+    return;
+  }
+  const intro = document.createElement('p');
+  intro.className = 'note-text';
+  intro.textContent = 'Quotient copy pack — copy each section into its matching Quotient field.';
+  container.appendChild(intro);
+  sections.forEach(section => {
+    const field = document.createElement('div');
+    field.className = 'field';
+    const label = document.createElement('label');
+    label.className = 'field-label';
+    label.textContent = section.label;
+    const textarea = document.createElement('textarea');
+    textarea.readOnly = true;
+    textarea.value = section.text;
+    textarea.style.minHeight = '110px';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'secondary-btn';
+    button.style.marginTop = '8px';
+    button.textContent = 'Copy this section';
+    button.addEventListener('click', () => copyQuotientSection(section.text, button));
+    field.append(label, textarea, button);
+    container.appendChild(field);
+  });
+  container.classList.remove('hidden');
 }
 
 function syncConditionalFields() {
