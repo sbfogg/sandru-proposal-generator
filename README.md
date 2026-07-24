@@ -1,11 +1,11 @@
 # Sandru Proposal Generator
 
-An internal tool for Sandru Technologies that helps techs quickly build job proposals (ButterflyMX, cameras, Doorking repairs, door hardware, WiFi, access control expansion) and generate formatted write-ups for Quotient using Claude.
+An internal tool for Sandru Technologies that helps techs quickly build job proposals (ButterflyMX, cameras, Doorking repairs, door hardware, WiFi, access control expansion) and generate formatted write-ups for Quotient.
 
 ## How it works
 
 - **`public/index.html`** — the single-page app. Sign in with a Google account restricted to `@sandrutech.com`. Fill out job details across tabs (ButterflyMX, Camera, Doorking, Door Hardware, Astragal Installation, WiFi, Access Expansion). Checking a hardware/material box (with quantity) automatically adds a matching line item to that tab's pricing section — just fill in the price.
-- **`functions/index.js`** — a Firebase Cloud Function (`generateProposal`) that verifies the signed-in user's Firebase ID token, checks their email domain, and forwards the built prompt to the Anthropic API to generate proposal text.
+- **`functions/index.js`** — Firebase Cloud Functions that verify the signed-in user's Firebase ID token and email domain. `generateProposal` uses Anthropic to write proposal text; `extractProposalData` uses OpenAI Structured Outputs to map pasted job information into the form.
 - **`firebase.json`** — hosting config. Includes a rewrite so requests to `/api/generateProposal` on the hosting domain are forwarded to the Cloud Function, so the frontend never needs a hardcoded function URL.
 - **`public/404.html`** — default Firebase 404 page.
 
@@ -27,7 +27,7 @@ sandru-proposal-generator/
 - Node.js 24 (see `functions/package.json` → `engines`)
 - [Firebase CLI](https://firebase.google.com/docs/cli): `npm install -g firebase-tools`
 - Access to the `sandru-proposal-generator` Firebase project
-- An `ANTHROPIC_API_KEY` secret configured in Firebase (see below)
+- `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` secrets configured in Firebase (see below)
 
 ## Setup on a new machine
 
@@ -55,10 +55,11 @@ firebase deploy --only functions
 
 ## Secrets
 
-The Cloud Function reads `ANTHROPIC_API_KEY` via Firebase's `defineSecret`. It's stored in Google Cloud Secret Manager tied to the project, not to any one machine, so you normally won't need to re-set it after a fresh clone. If it's ever missing:
+The Cloud Functions read `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` via Firebase's `defineSecret`. They are stored in Google Cloud Secret Manager tied to the project, not to any one machine, so you normally won't need to re-set them after a fresh clone. If either is missing:
 
 ```powershell
 firebase functions:secrets:set ANTHROPIC_API_KEY
+firebase functions:secrets:set OPENAI_API_KEY
 ```
 
 ## Access control
