@@ -144,7 +144,9 @@ Cedar Ridge Apartments
 Bellevue, WA 98004
 
 *Scope of Work*
-* Remove the existing DoorKing call box and install the new ButterflyMX intercom.
+* Remove the existing DoorKing call box.
+*Customer-Provided ButterflyMX Hardware*
+* Install and configure one (1) customer-provided ButterflyMX 8" Surface Intercom where the existing DoorKing call box was located.
 * Test the completed system for functionality.
 
 *Materials*
