@@ -34,6 +34,10 @@ const TEST_FILL_SCRIPT = `
   function setQty(id, val) { const cb = document.getElementById(id); const qty = cb && cb.parentElement.querySelector(".cb-qty"); if (!qty) return; qty.value = val; fire(qty, "input"); fire(qty, "change"); }
   function fill() {
     window._currentIdToken = "local-test-token";
+    if (testMode === "aifill") {
+      setVal("ai-source", 'Replace two existing call boxes with two ButterflyMX intercoms.');
+      return;
+    }
     if (testMode === "astragal") {
       if (typeof switchType === "function") switchType("astragal");
       setVal("ast-company", "Test Property Management");
@@ -95,12 +99,21 @@ const TEST_FILL_SCRIPT = `
   if (gate) gate.classList.add("hidden");
   if (localApp) localApp.classList.remove("hidden");
 
-  // Wait until the app UI is available, then populate a realistic job.
+  // Firebase auth may update after this injected script runs. Keep the local
+  // test UI visible long enough for that callback to settle, but fill only once.
+  var filled = false;
+  var attempts = 0;
   var t = setInterval(function () {
     var app = document.getElementById("app-wrap");
     if (gate) gate.classList.add("hidden");
     if (app) app.classList.remove("hidden");
-    if (app && !app.classList.contains("hidden")) { clearInterval(t); fill(); }
+    window._currentIdToken = "local-test-token";
+    if (app && !app.classList.contains("hidden") && !filled) {
+      filled = true;
+      fill();
+    }
+    attempts += 1;
+    if (attempts >= 20) clearInterval(t);
   }, 500);
 })();
 </scr` + `ipt>`;
@@ -123,8 +136,66 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === "/api/generateProposal" && req.headers.authorization === "Bearer local-test-token") {
         let prompt = null;
         try { prompt = JSON.parse(reqBody.toString("utf8")).prompt; } catch {}
-        const responseJson = { text: "Local test proposal generated successfully." };
+        const responseJson = { text: `*ButterflyMX Access Control Installation for Cedar Ridge Apartments*
+
+*Job Site*
+Cedar Ridge Apartments
+1234 Main St
+Bellevue, WA 98004
+
+*Scope of Work*
+* Remove the existing DoorKing call box.
+*Customer-Provided ButterflyMX Hardware*
+* Install and configure one (1) customer-provided ButterflyMX 8" Surface Intercom where the existing DoorKing call box was located.
+* Test the completed system for functionality.
+
+*Materials*
+* Black PVC Board
+* Cabling, Conduit, Connectors, Cable Support
+Total Materials: $300.00
+
+*Labor*
+* Installation and programming labor
+Total Labor: $1,280.00
+
+*Terms and Conditions*
+* Standard Sandru Technologies terms apply.` };
         lastGeneration = { time: new Date().toISOString(), status: 200, prompt, response: responseJson };
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(responseJson));
+        return;
+      }
+      if (url.pathname === "/api/extractProposalData" && req.headers.authorization === "Bearer local-test-token") {
+        const responseJson = {
+          extraction: {
+            proposalType: "butterfly",
+            fields: [],
+            checkboxes: [
+              {
+                id: "bf-bmx-2",
+                checked: true,
+                quantity: 2,
+                confidence: "medium",
+                evidence: "two ButterflyMX intercoms; the recessed mounting default applies"
+              },
+              {
+                id: "bf-bmx-4",
+                checked: true,
+                quantity: 26,
+                confidence: "high",
+                evidence: "twenty-six (26) ButterflyMX Standard Card Readers"
+              },
+              {
+                id: "bf-mat-0",
+                checked: true,
+                quantity: 2,
+                confidence: "high",
+                evidence: "two (2) Black PVC Boards"
+              }
+            ],
+            warnings: []
+          }
+        };
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(responseJson));
         return;
