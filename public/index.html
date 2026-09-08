@@ -5497,7 +5497,20 @@ TOTAL LABOR:${fmt(p.laborNet || p.laborGross || 0)}`;
               ? matches[index + 1].index
               : normalized.length;
           const content = normalized.slice(start, end).trim();
-          if (content) sections.push({ label: match[1], text: content });
+          if (!content) return;
+          // Quotient keeps Scope of Work and Notes in a single field, so the
+          // Notes block (its header included) is appended to the Scope of Work
+          // section rather than getting a copy box of its own.
+          const previous = sections[sections.length - 1];
+          if (
+            match[1].toLowerCase() === "notes" &&
+            previous &&
+            previous.label.toLowerCase() === "scope of work"
+          ) {
+            previous.text += "\n\n" + match[0].trim() + "\n" + content;
+            return;
+          }
+          sections.push({ label: match[1], text: content });
         });
         return sections;
       }
