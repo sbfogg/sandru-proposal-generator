@@ -5480,7 +5480,7 @@ TOTAL LABOR:${fmt(p.laborNet || p.laborGross || 0)}`;
           .trim();
         if (!normalized) return [];
         const matcher = new RegExp(
-          "^\\s*\\*?(" + QUOTIENT_SECTION_HEADINGS.join("|") + ")\\*?\\s*$",
+          "^\\s*\\*?(" + QUOTIENT_SECTION_HEADINGS.join("|") + "):?\\*?:?\\s*$",
           "gmi",
         );
         const matches = [...normalized.matchAll(matcher)];
