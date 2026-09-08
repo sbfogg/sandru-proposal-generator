@@ -4411,6 +4411,12 @@ Now generate the full proposal using this job data:
         if (!template) return;
         restoreWorkspace(template.snapshot);
         v("template-name").value = template.name;
+        // Loading a template starts a fresh proposal: clear any previously
+        // generated text and its Quotient copy sections so the output area
+        // never shows another property’s proposal alongside this form.
+        v("output-text").value = "";
+        renderQuotientSections("");
+        v("output-wrap").style.display = "none";
         writeStorage(STORAGE_KEYS.draft, serializeWorkspace());
         const status = v("autosave-status");
         if (status) {
