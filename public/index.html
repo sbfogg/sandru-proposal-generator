@@ -750,6 +750,9 @@
         <button class="type-btn" onclick="switchType('accessexpansion')">
           🔑 Access Expansion
         </button>
+        <button class="type-btn" onclick="switchType('liftmaster')">
+          🛗 LiftMaster / myQ
+        </button>
         <button class="type-btn" onclick="switchType('email')">
           ✉️ Monitoring Email
         </button>
@@ -3363,6 +3366,304 @@
         </div>
 
         <!-- ===================== MONITORING INTRO EMAIL ===================== -->
+        <div id="type-liftmaster" class="hidden">
+          <p class="page-title">LiftMaster / myQ Access Control</p>
+          <p class="page-sub">
+            New installs, expansions, CAPXLV2 video intercoms, and subscription-only quotes.
+          </p>
+
+          <div class="card">
+            <div class="card-title">Client & site</div>
+            <div class="grid2">
+              <div class="field">
+                <label class="field-label">Company name</label
+                ><input
+                  type="text"
+                  id="lm-company"
+                  placeholder="e.g. Abella Condos"
+                />
+              </div>
+              <div class="field">
+                <label class="field-label">Primary contact</label
+                ><input type="text" id="lm-contact" placeholder="" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">CC contacts (optional)</label
+              ><input type="text" id="lm-cc" placeholder="" />
+            </div>
+            <div class="field">
+              <label class="field-label">Property / building name</label
+              ><input type="text" id="lm-site" placeholder="" />
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label class="field-label">Street address</label
+                ><input type="text" id="lm-addr" placeholder="" />
+              </div>
+              <div class="field">
+                <label class="field-label">City, State ZIP</label
+                ><input type="text" id="lm-zip" placeholder="Seattle, WA" />
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Scope</div>
+            <div class="field">
+              <label class="field-label">Job type</label>
+              <select id="lm-type">
+                <option value="install">New LiftMaster system installation</option>
+                <option value="expansion">Expansion — additional doors</option>
+                <option value="intercom">CAPXLV2 Smart Video Intercom</option>
+                <option value="subscription">Subscription only (no hardware)</option>
+              </select>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label class="field-label">Total doors on system</label
+                ><input type="number" id="lm-doors" value="" min="1" />
+              </div>
+              <div class="field">
+                <label class="field-label">Key fobs to provide</label
+                ><input type="number" id="lm-fobs" value="" min="0" placeholder="e.g. 400" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Existing system being replaced</label
+              ><input type="text" id="lm-existing" placeholder="e.g. Doorking, or none" />
+            </div>
+            <div class="field">
+              <label class="field-label">Cabling approach</label>
+              <select id="lm-cabling">
+                <option value="new">Run new cabling</option>
+                <option value="conduit">New cabling + Conduit (WA law)</option>
+                <option value="panduit">New cabling + Panduit</option>
+                <option value="reuse">Reuse existing cabling</option>
+              </select>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label class="field-label">Transfer tenant database?</label>
+                <select id="lm-dbtransfer">
+                  <option value="yes">Yes — transfer from existing system</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field-label">Subscription quote # (optional)</label
+                ><input type="text" id="lm-subquote" placeholder="e.g. 182397" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Special notes</label
+              ><textarea
+                id="lm-notes"
+                placeholder="e.g. Clubhouse redevelopment; strikes pending field verification"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Hardware</div>
+            <div class="checkbox-grid">
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-0"
+                  data-label="LiftMaster CAP4AP Door Controller"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-0">LiftMaster CAP4AP Door Controller</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-1"
+                  data-label="LiftMaster/myQ Smart Card Reader (Standard)"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-1">LiftMaster/myQ Smart Card Reader (Standard)</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-2"
+                  data-label="LiftMaster CAPXLV2 Smart Video Intercom"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-2">LiftMaster CAPXLV2 Smart Video Intercom</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-3"
+                  data-label="Key Fobs"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-3">Key Fobs</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-4"
+                  data-label="Altronix Power Supply w/ Backup Batteries"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-4">Altronix Power Supply w/ Backup Batteries</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-5"
+                  data-label="UPS Backup Battery"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-5">UPS Backup Battery</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-6"
+                  data-label="16-Port Gigabit PoE Network Switch"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-6">16-Port Gigabit PoE Network Switch</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-7"
+                  data-label="Electrified Door Strike"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-7">Electrified Door Strike</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-8"
+                  data-label="Maglock"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-8">Maglock</label>
+              </div>
+              <div class="cb-row">
+                <input
+                  type="checkbox"
+                  id="lm-hw-9"
+                  data-label="Access Control Cabling, Panduit, Conduit, Connectors, Cable Support"
+                />
+                <input type="number" class="cb-qty" value="1" min="1" disabled />
+                <label class="cb-label" for="lm-hw-9">Access Control Cabling, Panduit, Conduit, Connectors, Cable Support</label>
+              </div>
+            </div>
+            <div id="lm-hw-custom"></div>
+            <button class="add-btn" onclick="addCustom('lm-hw-custom')">
+              + Add custom item
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Pricing</div>
+            <div class="grid3">
+              <div class="field">
+                <label class="field-label">Labor hours</label
+                ><input
+                  type="number"
+                  id="lm-lhrs"
+                  value=""
+                  oninput="calcPrice('lm')"
+                />
+              </div>
+              <div class="field">
+                <label class="field-label">Rate ($/hr) — standard</label
+                ><input
+                  type="number"
+                  id="lm-lrate"
+                  value=""
+                  oninput="calcPrice('lm')"
+                />
+              </div>
+              <div class="field">
+                <label class="field-label">Labor discount %</label
+                ><input
+                  type="number"
+                  id="lm-ldisc"
+                  value="0"
+                  min="0"
+                  max="100"
+                  oninput="calcPrice('lm')"
+                />
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field" style="grid-column: 1/-1">
+                <label class="field-label">Materials line items</label>
+                <div class="line-items" id="lm-lineitems"></div>
+                <button
+                  type="button"
+                  class="add-btn"
+                  onclick="addLineItem('lm')"
+                >
+                  + Add line item
+                </button>
+                <p class="note-text">
+                  Adding line items auto-fills Materials cost below. You can
+                  still type a different number into Materials cost directly to
+                  override it.
+                </p>
+              </div>
+              <div class="field">
+                <label class="field-label">Materials cost ($)</label
+                ><input
+                  type="number"
+                  id="lm-mcost"
+                  value=""
+                  oninput="calcPrice('lm')"
+                />
+              </div>
+              <div class="field">
+                <label class="field-label">Materials discount %</label
+                ><input
+                  type="number"
+                  id="lm-mdisc"
+                  value="0"
+                  min="0"
+                  max="100"
+                  oninput="calcPrice('lm')"
+                />
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label class="field-label">Overall discount %</label
+                ><input
+                  type="number"
+                  id="lm-odisc"
+                  value="0"
+                  min="0"
+                  max="100"
+                  oninput="calcPrice('lm')"
+                />
+              </div>
+              <div class="field">
+                <label class="field-label">Sales tax</label>
+                <select id="lm-tax" onchange="calcPrice('lm')">
+                  <option value="yes">Yes — 10.55%</option>
+                  <option value="no">No (tax exempt)</option>
+                </select>
+              </div>
+            </div>
+            <table class="price-table" id="lm-price-table"></table>
+          </div>
+
+          <button class="generate-btn" onclick="generate('lm')">
+            Generate proposal text →
+          </button>
+        </div>
+
+        <!-- ===================== MONITORING INTRO EMAIL ===================== -->
         <div id="type-email" class="hidden">
           <p class="page-title">Monitoring Intro Email</p>
           <p class="page-sub">
@@ -3663,6 +3964,9 @@ STRUCTURE:
    - WA conduit rule in Notes (include whenever conduit is run): "* *Conduit will be run wherever required for this installation (according to Washington State Law)*" / "** Anything under 7ft will require Conduit to be run". The equivalent longer form is "** Any cabling below 7ft will require conduit; anything above 7ft doesn't require conduit".
    - Ceiling cuts (when cable runs require opening the ceiling): "** Sandru Technologies will need to make cuts into the ceiling in order to run this cabling", plus a materials bullet "* Provide and install [qty] 12x12 Fire-Rated Ceiling Access Panels for this system deployment" with "** These will be used to cover the cuts that were made into the ceiling for the required cabling". Recap in Notes as "* *As stated above, Sandru Technologies will need to make cuts into the ceiling in order to run the required cabling*" / "** Sandru Technologies will install ceiling access panels to cover these ceiling cuts". Use the same shape for doorframe cuts required by a strike installation.
    - Camera install line: "* Provide and install [N] 8MP Active Deterrence Cameras throughout the property for this system deployment" (or "position and aim each camera to achieve optimal coverage of the intended area" / "positioned/aimed for optimal coverage"). For takeovers use "* Takeover [N] 8MP Active Deterrence Cameras throughout the property; position and angle each camera to maximize coverage of the designated areas".
+   - RTTC (camera systems, when the job data mentions it or police integration is relevant): "* This system can be integrated with the Seattle Police Department's new RTTC Program (Real Time Crime Center)".
+   - CABLING ORIGIN: when cable runs start from the telco/IT room, say so - "* Run required cabling from the TELCO Room to the above camera locations" with "** Conduit will be necessary in certain areas for these cable runs".
+   - TENANT ACCESS: when the work requires entering tenant units or private areas, add a Notes bullet "* *On-site staff will need to coordinate with the tenants beforehand so that we're able to access what's needed on the day of the installation*".
    - LOCATION LISTS: when the job data enumerates specific camera positions or doors, list them as third-level sub-bullets beneath the summary bullet, one per line, keeping the customer's own numbering/labels verbatim — e.g. "** Sandru Technologies will install thirty-two (32) total cameras for this system deployment--see the locations below:" then "*** 1. South Gate Entrance (PTZ)", "*** 2. South Public Path Entrance (PTZ)". Do not invent locations that aren't in the job data.
    - Camera systems use BOTH a networking switch AND a separate Router/Firewall as distinct devices — e.g. "* Provide and install one (1) 24-Port PoE Networking Switch for this system deployment; configure as required" and "* Provide and install one (1) Router/Firewall for this system deployment; configure as required". (Never combine them into "Networking Switch/Firewall".) The UPS/Backup Battery keeps its "** This Backup Battery will provide continued power to the system in the event of a power interruption" sub-bullet.
 
@@ -3678,7 +3982,9 @@ STRUCTURE:
    - Credentials: "* *Before any installation begins, the new credentials (ex: windshield tags, fobs, etc.) will need to be assigned and distributed to tenants and staff on site*" / "** This is not Sandru's responsibility; this is to be done by on-site staff and [Vendor] Support directly".
    - Internet: "* *At the time of installation, the customer must provide hard-wired internet on-site for this [Vendor] system/installation*".
    - Vendor training: "* *Any system training is to be provided by [Vendor] and their support team*".
+   - MODULAR / EXTENSIBILITY (access-control systems that can grow - LiftMaster, ButterflyMX, Doorking): "* *This system is modular, and can be extended to other doors as needed--for example:*" with nested examples drawn from the job when known, otherwise the standard set: "** Smart Locks for Unit Doors", "** Common Area Doors", "** Garage Doors, etc., etc.". Include it when the job data suggests further expansion is possible; omit it on one-off repairs and materials-only proposals.
    - SCOPE LIMIT (include on small/one-off jobs — door hardware, single-door expansions, software setups): "* *This proposal only covers the above-mentioned Scope of Work and the material list below*" / "** Anything outside of that will require a change-order with additional charges (pending customer approval)". For labor-driven jobs use the variant "* *The labor hours in this proposal only cover what's discussed in the above Scope of Work*" / "** Anything outside of that scope will require additional labor hours, and will be run as a change-order with additional charges (pending customer approval)".
+   - DISCOUNT CONTINGENCY (whenever the job data shows a discount applied to materials or labor): "* *Some discounts have been applied to both the materials and labor in this proposal*" / "** These discounts are contingent on [what they depend on - e.g. the number of cameras installed and the monitoring service]" / "*** If the customer wishes to move forward with less [cameras/monitored cameras/scope], then the pricing/discounts will need to be adjusted".
    - VENDOR SUBSCRIPTION FEES (when the system carries recurring vendor cost): Doorking — "* *There may be some additional subscription fees associated with this Doorking system expansion*" / "** Those fees would need to be paid directly to Doorking". Brivo — "* *This Brivo system does come with some monthly fees - those are highlighted below*" / "** This subscription is billed for the entire year in advance; it's not a monthly bill" / "*** If we're partially through the current year, we'll bill the subscription through the end of the current year".
    - DATABASE EXCLUSION (non-ButterflyMX systems where Sandru does no database work): "* *This proposal does not include any database work for this new [Brand] system*" / "** Any database work is to be done by the customer".
    - THIRD-PARTY COORDINATION (elevator company, locksmith, etc.): state that the work is not Sandru's — e.g. "* *A locksmith will be required to change the existing door locks*" / "** This is not Sandru's responsibility; this is to be coordinated by on-site staff directly", or "* *This proposal does not cover the elevator company's scope of work or labor--see below for further details*" / "** The customer will need to get an additional quote from the elevator company for their portion of this installation". When the other trade has its own tasks, list them under a bold header like "*Elevator Company's Scope of Work:*" as plain bullets.
@@ -3731,6 +4037,19 @@ WHAT TO BOLD — apply single-asterisk bold to exactly these elements and no oth
 NEVER USE: #, ##, **double asterisks for bold**, numbered lists, | pipe tables, --- dividers, or _ underscores. These are standard Markdown and will appear as raw characters in Quotient.
 
 LINKS: if a link is ever needed, Quotient renders "Link Text":https://url — the visible label in straight double quotes, then a colon, then the raw URL with NO space. Do NOT use Markdown link syntax [text](url).
+
+LIFTMASTER / myQ SYSTEMS - additional rules (apply when TYPE is LiftMaster Access Control):
+   - Opening bullet: "* Install a new LiftMaster access control system for [Property]" (or "* Expand the existing LiftMaster access control system at [Property] to cover additional doors"), with the nested door count: "** This system will control [N] total doors on site".
+   - Program the hardware with "* Program and configure this newly installed LiftMaster hardware as required; tie to the existing network" - LiftMaster is configured by Sandru, not by a vendor support line.
+   - Key fobs, when the job data gives a quantity: "* Provide [N] Key Fobs to be distributed to staff and tenants".
+   - Close with "* Customer training on their newly installed LiftMaster system".
+   - NOTES that are close to universal on LiftMaster jobs - include each when the job data supports it:
+     * *Sandru Technologies will help transfer the existing tenant database from the current system to this new LiftMaster system* (only when TRANSFER TENANT DATABASE is yes)
+     * *The customer will need to provide a complete tenant list that contains the following at a minimum:* with the requirements as nested sub-bullets in this order - First and Last Name; Unit Number; Phone Number; Email Address; Existing Credential Information (if applicable). Write them as plain "** " sub-bullets, NOT as a numbered list.
+     * *The customer will need to provide a reliable, hard-wired internet connection for this new LiftMaster system*
+     * *This LiftMaster system does carry some subscription fees - those are highlighted below* (or "in a separate proposal (Quote Number: [N])" when SUBSCRIPTION QUOTE # is given) / "** This subscription is billed in advance for the year--it is NOT a monthly fee". When the subscription is billed per unit rather than per door, add "** That subscription is billed per-unit, and the number of units isn't changing with this system expansion" on expansions.
+     * *Door strikes and maglocks are not included in this proposal unless confirmed after field verification* / "** If any of that hardware is needed, a change-order will be issued with additional costs (pending customer approval)"
+     * *Sandru Technologies is not responsible for the operation of existing equipment that is installed on site*
 
 ASTRAGAL INSTALLATIONS — additional rules (apply when TYPE is Astragal Installation; these override the general system-opening rules wherever they conflict):
    - Title: "*Full-Door Interlocking Astragal Installation for [Property Name]*". When related access-control repairs are included, use "*Door Hardware Repairs + Astragal Installation for [Property Name]*".
@@ -4093,6 +4412,7 @@ Now generate the full proposal using this job data:
         ast: "astragal",
         wifi: "wifi",
         ax: "accessexpansion",
+        lm: "liftmaster",
       };
       const TYPE_LABELS = {
         butterfly: "ButterflyMX",
@@ -4102,6 +4422,7 @@ Now generate the full proposal using this job data:
         astragal: "Astragal Installation",
         wifi: "WiFi / Networking",
         accessexpansion: "Access Expansion",
+        liftmaster: "LiftMaster / myQ",
         email: "Monitoring Email",
       };
       let currentType = "butterfly";
@@ -4168,7 +4489,7 @@ Now generate the full proposal using this job data:
         });
 
         const lineItems = {};
-        ["bf", "cam", "dk", "dh", "ast", "wifi", "ax"].forEach((prefix) => {
+        ["bf", "cam", "dk", "dh", "ast", "wifi", "ax", "lm"].forEach((prefix) => {
           const container = v(prefix + "-lineitems");
           lineItems[prefix] = container
             ? Array.from(container.querySelectorAll(".line-item-row")).map(
@@ -4223,7 +4544,7 @@ Now generate the full proposal using this job data:
           Object.keys(checkboxLineItemRows).forEach(
             (key) => delete checkboxLineItemRows[key],
           );
-          ["bf", "cam", "dk", "dh", "ast", "wifi", "ax"].forEach((prefix) => {
+          ["bf", "cam", "dk", "dh", "ast", "wifi", "ax", "lm"].forEach((prefix) => {
             const container = v(prefix + "-lineitems");
             if (container) container.innerHTML = "";
             (snapshot.lineItems?.[prefix] || []).forEach((item) =>
@@ -4237,7 +4558,7 @@ Now generate the full proposal using this job data:
           applyStandardLaborRate();
           // Reapply explicitly entered material totals after line-item reconstruction;
           // users are allowed to override the calculated line-item sum.
-          ["bf", "cam", "dk", "dh", "ast", "wifi", "ax"].forEach((prefix) => {
+          ["bf", "cam", "dk", "dh", "ast", "wifi", "ax", "lm"].forEach((prefix) => {
             const savedMaterials = snapshot.controls[prefix + "-mcost"];
             if (savedMaterials !== undefined && v(prefix + "-mcost"))
               v(prefix + "-mcost").value = savedMaterials;
@@ -4468,6 +4789,7 @@ Now generate the full proposal using this job data:
         "astragal",
         "wifi",
         "accessexpansion",
+        "liftmaster",
         "email",
       ];
       function switchType(t) {
@@ -4497,6 +4819,7 @@ Now generate the full proposal using this job data:
           astragal: "ast",
           wifi: "wifi",
           accessexpansion: "ax",
+          liftmaster: "lm",
         }[t];
       }
 
@@ -4990,6 +5313,16 @@ ${phone} | ${email} | https://www.sandrumonitoring.com/`;
             "ax-lhrs",
             "ax-lrate",
           ],
+          lm: [
+            "lm-company",
+            "lm-contact",
+            "lm-site",
+            "lm-addr",
+            "lm-zip",
+            "lm-doors",
+            "lm-lhrs",
+            "lm-lrate",
+          ],
         };
         const errors = [];
         let firstInvalid = null;
@@ -5346,6 +5679,33 @@ HARDWARE:${hwItems.join("; ") || "none"}
 SPECIAL NOTES:${val("ax-notes") || "none"}
 TOTAL MATERIALS:${fmt(p.matsNet || p.m || 0)}
 TOTAL LABOR:${fmt(p.laborNet || p.laborGross || 0)}`;
+        } else if (prefix === "lm") {
+          const hwItems = [];
+          document.querySelectorAll('[id^="lm-hw-"]').forEach((cb) => {
+            if (cb.type === "checkbox" && cb.checked) {
+              const qty =
+                parseInt(cb.parentElement.querySelector(".cb-qty")?.value) || 1;
+              hwItems.push(numWord(qty) + " " + cb.dataset.label);
+            }
+          });
+          document
+            .querySelectorAll("#lm-hw-custom input[type=text]")
+            .forEach((inp) => {
+              if (inp.value.trim()) hwItems.push(inp.value.trim());
+            });
+
+          prompt =
+            PROMPT_HEADER +
+            `GENERATE_PROPOSAL|TYPE:LiftMaster Access Control
+CLIENT:${val("lm-company")}|CONTACT:${val("lm-contact")}|CC:${val("lm-cc") || "none"}
+SITE:${val("lm-site")}|ADDRESS:${val("lm-addr")}, ${val("lm-zip")}
+JOB TYPE:${val("lm-type")}|TOTAL DOORS:${val("lm-doors")}|CABLING:${val("lm-cabling")}
+EXISTING SYSTEM:${val("lm-existing") || "none"}|KEY FOBS:${val("lm-fobs") || "none"}
+TRANSFER TENANT DATABASE:${val("lm-dbtransfer")}|SUBSCRIPTION QUOTE #:${val("lm-subquote") || "not referenced"}
+HARDWARE:${hwItems.join("; ") || "none"}
+SPECIAL NOTES:${val("lm-notes") || "none"}
+TOTAL MATERIALS:${fmt(p.matsNet || p.m || 0)}
+TOTAL LABOR:${fmt(p.laborNet || p.laborGross || 0)}`;
         }
 
         const outWrap = v("output-wrap");
@@ -5536,7 +5896,7 @@ TOTAL LABOR:${fmt(p.laborNet || p.laborGross || 0)}`;
       });
 
       // ── INIT ALL PRICE TABLES ─────────────────────────────────────
-      ["bf", "cam", "dk", "dh", "ast", "wifi", "ax"].forEach(calcPrice);
+      ["bf", "cam", "dk", "dh", "ast", "wifi", "ax", "lm"].forEach(calcPrice);
       syncConditionalFields();
       renderTemplates();
       renderHistory();

@@ -133,7 +133,7 @@ exports.extractProposalData = onRequest(
         properties: {
           proposalType: {
             type: "string",
-            enum: ["butterfly", "camera", "doorking", "doorhardware", "astragal", "wifi", "accessexpansion", "email"]
+            enum: ["butterfly", "camera", "doorking", "doorhardware", "astragal", "wifi", "accessexpansion", "liftmaster", "email"]
           },
           fields: {
             type: "array",
