@@ -1318,7 +1318,7 @@
                 />
               </div>
               <div class="field">
-                <label class="field-label">Rate ($/hr)</label
+                <label class="field-label">Rate ($/hr) — standard</label
                 ><input
                   type="number"
                   id="bf-lrate"
@@ -1820,7 +1820,7 @@
                 />
               </div>
               <div class="field">
-                <label class="field-label">Rate ($/hr)</label
+                <label class="field-label">Rate ($/hr) — standard</label
                 ><input
                   type="number"
                   id="cam-lrate"
@@ -2117,7 +2117,7 @@
                 />
               </div>
               <div class="field">
-                <label class="field-label">Rate ($/hr)</label
+                <label class="field-label">Rate ($/hr) — standard</label
                 ><input
                   type="number"
                   id="dk-lrate"
@@ -2407,7 +2407,7 @@
                 />
               </div>
               <div class="field">
-                <label class="field-label">Rate ($/hr)</label
+                <label class="field-label">Rate ($/hr) — standard</label
                 ><input
                   type="number"
                   id="dh-lrate"
@@ -2737,7 +2737,7 @@
                 />
               </div>
               <div class="field">
-                <label class="field-label">Rate ($/hr)</label
+                <label class="field-label">Rate ($/hr) — standard</label
                 ><input
                   type="number"
                   id="ast-lrate"
@@ -3004,7 +3004,7 @@
                 />
               </div>
               <div class="field">
-                <label class="field-label">Rate ($/hr)</label
+                <label class="field-label">Rate ($/hr) — standard</label
                 ><input
                   type="number"
                   id="wifi-lrate"
@@ -3276,7 +3276,7 @@
                 />
               </div>
               <div class="field">
-                <label class="field-label">Rate ($/hr)</label
+                <label class="field-label">Rate ($/hr) — standard</label
                 ><input
                   type="number"
                   id="ax-lrate"
@@ -4047,6 +4047,8 @@ Now generate the full proposal using this job data:
           });
           toggleMonitoring();
           onBmxSupplyChange();
+          // A saved draft may carry an old hourly rate; the rate is fixed now.
+          applyStandardLaborRate();
           syncConditionalFields();
           const prefix = prefixFor(extraction.proposalType);
           if (prefix) calcPrice(prefix);
@@ -4231,6 +4233,8 @@ Now generate the full proposal using this job data:
           });
           toggleMonitoring();
           onBmxSupplyChange();
+          // A saved draft may carry an old hourly rate; the rate is fixed now.
+          applyStandardLaborRate();
           // Reapply explicitly entered material totals after line-item reconstruction;
           // users are allowed to override the calculated line-item sum.
           ["bf", "cam", "dk", "dh", "ast", "wifi", "ax"].forEach((prefix) => {
@@ -4763,6 +4767,22 @@ ${phone} | ${email} | https://www.sandrumonitoring.com/`;
         });
         return rows.length ? rows.join("; ") : "none";
       }
+
+      // ── STANDARD LABOR RATE ───────────────────────────────────────
+      // Sandru bills labor at a flat shop rate, so techs never type it.
+      // Change this one constant if the rate ever changes.
+      const LABOR_RATE_PER_HOUR = 160;
+
+      function applyStandardLaborRate() {
+        document.querySelectorAll('input[id$="-lrate"]').forEach((input) => {
+          input.value = LABOR_RATE_PER_HOUR;
+          input.readOnly = true;
+          input.title =
+            "Standard shop rate ($" + LABOR_RATE_PER_HOUR + "/hr). Fixed for all proposals.";
+        });
+      }
+
+      applyStandardLaborRate();
 
       // ── PRICE CALC ────────────────────────────────────────────────
       function calcPrice(prefix) {
