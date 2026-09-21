@@ -3689,81 +3689,16 @@ STRUCTURE:
    - Cabling recap for camera systems uses the PARTIAL wording when new cabling was run: "* *As stated above, Sandru Technologies will be reusing the existing cabling for the majority of this system installation*", same change-order sub-bullet, then "*** The only new cabling included in this proposal is for the [N] new cameras being installed in new locations".
 5. Materials: a SINGLE bulleted list of every Sandru-provided hardware/material item with its quantity and NO prices — do not show per-item costs. For ButterflyMX proposals, apply rule 3c: include Sandru-supplied ButterflyMX hardware, but exclude all customer-provided vendor-direct ButterflyMX hardware because it is listed only in Scope of Work. Add "* Other miscellaneous materials" as the final bullet. Then, on its own line directly below the list, show the combined materials total exactly as given in the job data (the TOTAL MATERIALS figure), labeled: "Total Materials: $X.XX". For camera systems, in addition to the itemized hardware, always include the two standard supporting-materials bullets "* Camera Brackets, Junction Boxes" and "* Cabling, Conduit, Connectors, Cable Support" just before "* Other miscellaneous materials".
 6. Labor: a bulleted list of the labor categories only — "* Design", "* Installation", "* Setup", "* Programming", "* Customer Training" — with NO hours and NO hourly rate. Then, on its own line directly below, show the labor lump sum exactly as given (the TOTAL LABOR figure), labeled: "Total Labor: $Y.YY".
-7. Do NOT output a Subtotal / Tax / grand Total pricing block — Quotient computes those from the totals entered into it separately. The only dollar figures in the proposal are the "Total Materials" and "Total Labor" lines above. If monitoring service is included, the ONLY monitoring dollar figure in the body is the per-camera monthly rate, expressed in the Monitoring Service "Notes:" discount bullet (see the monitoring section below) — do NOT add a separate "monthly recurring total" or contract-term line.
-8. ALWAYS close with this exact boilerplate. Use "Sandru Technologies, LLC" as the company name throughout — never abbreviate it to "Sandru Tech" and never leave a bracketed placeholder. The "Important Notice About Hardware Pricing" paragraph is BOLD (wrapped in single asterisks). The Payment Terms clauses and the Notes and Exclusions items are BULLETED with "* " (with "** " for the overdue sub-line). Reproduce it exactly like this:
+7. Do NOT output a Subtotal / Tax / grand Total pricing block — Quotient computes those from the totals entered into it separately. The only dollar figures in the proposal are the "Total Materials" and "Total Labor" lines above. If monitoring service is included, the ONLY monitoring dollar figure in the body is the per-camera monthly rate, expressed in the *Notes:* discount bullet (see the monitoring rules below) — do NOT add a separate "monthly recurring total" or contract-term line.
+8. Do NOT output any closing boilerplate. The "Important Notice About Hardware Pricing", "Terms and Conditions", "Payment Terms", and "Notes and Exclusions" blocks already live in the Quotient template that the quote is built from, so regenerating them here would only duplicate them. End the proposal after the Labor section.
 
-*Important Notice About Hardware Pricing*
-*Due to ongoing fluctuations in global tariffs and supply chain conditions, hardware pricing is subject to change without notice. While we do our best to provide accurate estimates, quoted prices are not guaranteed until confirmed. We kindly ask that you contact us prior to accepting any proposal so we can verify current pricing and availability. This ensures transparency and helps avoid any surprises down the line. We appreciate your understanding and partnership.*
+MONITORING SERVICE (when MONITORING is YES): do NOT output the "Why Video Monitoring?" section, the Sandru Monitoring video links, or the "Monitoring Service (12-Hour)" section. All of that text is fixed and already lives in the Quotient monitoring template. The only monitoring content you generate is job-specific, and it goes in the *Notes:* section:
+   - The monitoring intro and internet-requirement bullets described in rule 4.
+   - ONLY when the monitoring rate in the job data is below the standard $150/camera per month, add a bold lead bullet "* *This monitoring service has been discounted from $150/camera per month to $[rate]/camera per month*" using the actual rate; and when the total camera count is greater than 20, add the nested sub-bullet "** This is a \"bulk deal\" because this system has >20 cameras total". If the rate is the standard $150, omit the discount note entirely.
 
-These prices are based upon payment being made by Check or Cash
-We accept credit/debit cards for a 4% processing fee. Let us know prior to invoicing if you wish to use a credit/debit card.
+SECTION ORDER is exactly: Title, *Job Site*, *Scope of Work*, *Notes:*, *Materials* (with Total Materials), *Labor* (with Total Labor). Output nothing after the Labor block.
 
-*Terms and Conditions:*
-*Payment Terms*
-* Sandru Technologies, LLC requires a 50% down payment prior to starting the project and 50% will be invoiced to the customer as progress billing.
-* All invoices received shall be paid by the customer within fifteen (15) days of the date of invoice unless otherwise agreed in writing by Sandru Technologies, LLC. In the event of late payment, Sandru Technologies, LLC may charge interest on the amount outstanding before and after the agreement. Invoices that are still unpaid after the invoice due date are subject to late fees. Sandru Technologies, LLC may impose a monthly surcharge equal to 5% of the outstanding amount.
-** 15 days overdue = 2.5%; 30 days overdue = 5%
-* If any amount of the invoice is disputed by the customer, the customer shall inform Sandru Technologies, LLC of the grounds for such dispute within seven (7) days of acceptance of the terms and shall pay to Sandru Technologies, LLC the value of the invoice less the disputed amount in accordance with these payment terms.
-* Where Sandru Technologies, LLC requires payment of a deposit, the customer acknowledges that the deposit is not returnable.
-* All fees are exclusive of value-added taxes which will be added to invoices where appropriate.
-* Sandru Technologies, LLC reserves the right to increase a quoted fee in the event that the client requests a variation to the work agreed.
-* This proposal is valid only for 30 days from the date it is presented.
-
-*Notes and Exclusions:*
-* All painting/patching/drywall work required is to be performed by the owner.
-* All work is to be performed during normal hours, 7:00 am to 5:00 pm, Monday through Friday, excluding Holidays.
-* Any extra work not included in this Scope of Work, if any, will be performed at an additional cost.
-* General Contractor is to provide the valid Reseller Permit. If Reseller Permit is not received, sales tax will be added to the invoice.
-
-MONITORING SERVICE (when MONITORING is YES): include all of the following. SECTION ORDER for a camera job with monitoring is exactly: Title, *Job Site*, *Scope of Work*, *Notes*, *Why Video Monitoring?* (with the video links), *Materials* (+ Total Materials), *Labor* (+ Total Labor), *Monitoring Service (12-Hour)*, its *Notes:*, then the *Important Notice About Hardware Pricing* / Terms boilerplate.
-
-(a) The "Why Video Monitoring?" section — reproduce this text VERBATIM (the first line and the first video link are bold; substitute nothing except leave it exactly as written):
-
-*Why Video Monitoring?*
-*Unlike a typical camera system deployment, monitoring services allow for a proactive approach to crime prevention.*
-
-Our systems are equipped with cameras that have two-way communication, meaning that our Dispatchers can communicate directly with any visitors via the camera's microphone and speaker.
-
-Most property-related crimes happen when an individual knows that nobody is actively watching/monitoring the area to witness them. When a potential trespasser knows that there's an active Dispatcher monitoring any camera feeds, it often deters them from entering the premises to begin with.
-
-Additionally, our cameras are equipped with LED lights and sirens for added deterrence - if the two-way communication approach isn't enough, the Dispatcher can remotely trigger LED lights and sirens to further deter any trespassers.
-
-If all of these deterrence attempts aren't enough, and a trespasser persists, we will dispatch the local authorities to intervene. This is rarely the case - most individuals leave upon hearing Dispatch/the sirens, or seeing the LEDs flash.
-
-*"Sandru Monitoring - Our System in Action":https://www.youtube.com/playlist?list=PL8zqosssgMP2F7EFKUYKEMdeBYvvVNwGR*
-"Sandru Monitoring - Proactive Video Monitoring":https://www.youtube.com/watch?v=9ggR_hdPXNk
-"Sandru Monitoring - Property Crime in Seattle":https://www.youtube.com/watch?v=bc830vyv8wo
-"Sandru Monitoring - Website":https://www.sandrumonitoring.com/
-
-(b) The "*Monitoring Service (12-Hour)*" section — reproduce this VERBATIM, substituting only [N] with the actual number of monitored cameras from the job data:
-
-*Monitoring Service (12-Hour)*
-* 12-hour monitoring service for [N] cameras positioned throughout the property
-* Coverage is from 6p-6a each day/night
-* Each of our proposed cameras is equipped with two-way communication
-** Two-way communication is an essential feature in incident/theft deterrence
-** This feature allows for communication directly through the camera's microphone
-** Often, this is the first and only response needed to deescalate most incidents
-** Because it's remote intervention via the camera's microphone, staff won't have to physically intervene during an incident, keeping them safe from harm
-* Each proposed camera is equipped with red/blue lights and a siren for additional deterrence purposes
-* Sandru Technologies/Monitoring will use our cloud-based software for monitoring these cameras
-* Our dispatchers will monitor each camera throughout property, including all areas within their FOV
-** They receive real-time event notifications to ensure swift and immediate incident response
-** Actively monitoring these entrances/exits will prevent any piggy-backing/trailing from unauthorized strangers attempting to enter the space (ex: grabbing an already opened door, trailing behind a tenant to gain access)
-** Dispatch will involve the authorities whenever necessary, but will also communicate with on-site staff (concierge, office staff, or on-site security) in the event of an incident
-* We work on a cloud-based system and will provide any recordings via email to the client as needed/requested
-* Incident reports will be provided to the client accordingly
-* Our camera system provides the highest quality resolution on the market - all recordings will be saved in 4K quality
-
-(c) Immediately after that section, add its own "*Notes:*" block:
-
-*Notes:*
-* The customer will need to provide high-speed internet with a minimum of 8MB/s uploading speed per camera
-** A dedicated public static-IP + handoff will be required as well - this is to be done by the customer
-
-Then, ONLY when the monitoring rate in the job data is below the standard $150/camera per month, add the discount note as a bold lead bullet: "* *This monitoring service has been discounted from $150/camera per month to $[rate]/camera per month*" using the actual rate; and when the total camera count is greater than 20, add the nested sub-bullet "** This is a \"bulk deal\" because this system has >20 cameras total". If the rate is the standard $150 (no discount), omit the discount note entirely.
-
-DO NOT invent dollar amounts or tax rates not provided below — use the exact figures given. DO NOT omit the boilerplate sections. DO NOT change any dollar figure from what's specified. Keep scope items grounded only in the job data provided — do not add equipment or steps not implied by it.
+DO NOT invent dollar amounts or tax rates not provided below — use the exact figures given. DO NOT change any dollar figure from what's specified. Keep scope items grounded only in the job data provided — do not add equipment or steps not implied by it.
 
 FORMATTING — this output is pasted directly into Quotient's scope-of-work field. Quotient uses its OWN markup — NOT standard Markdown. Follow these rules exactly, character for character:
 
@@ -3777,7 +3712,7 @@ BULLETS: Every scope-of-work line item must start with "* " (one asterisk then a
 ** If the existing cable is faulty and won't work, or additional cabling is needed, a change-order will be issued with additional charges (pending customer approval)
 *** No new cabling is included in this proposal
 
-LINE SPACING: Do NOT put a blank line between bullet lines. Every bullet and its ** / *** sub-points appear on directly consecutive lines with no empty line between them. Insert a single blank line ONLY before a bold section header (before *Notes*, *Materials*, *Labor*, *Important Notice About Hardware Pricing*, *Terms and Conditions*, *Payment Terms*, *Notes and Exclusions*) and after the title and after the Job Site block. In particular, the entire Scope of Work is one unbroken block of bullets — the first blank line after Scope of Work comes immediately before the *Notes* header.
+LINE SPACING: Do NOT put a blank line between bullet lines. Every bullet and its ** / *** sub-points appear on directly consecutive lines with no empty line between them. Insert a single blank line ONLY before a bold section header (before *Notes:*, *Materials*, *Labor*) and after the title and after the Job Site block. In particular, the entire Scope of Work is one unbroken block of bullets — the first blank line after Scope of Work comes immediately before the *Notes* header.
 
 WHAT TO BOLD — apply single-asterisk bold to exactly these elements and no others:
 
@@ -3788,20 +3723,14 @@ WHAT TO BOLD — apply single-asterisk bold to exactly these elements and no oth
    *Notes:* (write the Notes header WITH a trailing colon — this is the prevailing house style)
    *Materials*
    *Labor*
-   *Important Notice About Hardware Pricing*
-   *Terms and Conditions*
-   *Payment Terms*
-   *Notes and Exclusions*
-   *Why Video Monitoring?* (only if monitoring is included)
-   *Monitoring Service (12-Hour)* (only if monitoring is included)
 3. Any sub-section header within Scope of Work when the job has clearly separated zones or phases (e.g. *Building 900*, *Clubhouse Scope of Work*, *Property Entrance Scope of Work*) — bold these exactly like major section headers. On multi-building jobs, name each zone with a trailing colon and group its bullets beneath it (*Building D2:*, *Building F:*, *Garage Elevator Vestibules:*), then resume shared work under *Scope of Work Continued:*. Also bold the vendor-materials header *Materials to be Provided by the Customer (directly from ButterflyMX):* and any third-party scope header such as *Elevator Company's Scope of Work:*.
 4. The lead line of each Notes caveat bullet, and the cabling-reuse lead bullet in Scope of Work, are wrapped in single-asterisk bold (e.g. "* *Before any installation begins, the database for this new system needs to be built and ready for configuration*"). Their nested ** and *** detail lines are left UNbolded.
-5. These specific bold exceptions also apply: the entire "Important Notice About Hardware Pricing" paragraph is bold; the "*Unlike a typical camera system deployment...*" lead line of Why Video Monitoring? is bold; the FIRST video link line ("Sandru Monitoring - Our System in Action") is bold while the other three link lines are not; and the monitoring discount lead bullet is bold.
+5. The monitoring discount lead bullet is bold, exactly like any other Notes caveat lead line.
 6. Nothing else. Do not bold prices, body text, or ordinary scope bullets beyond those named above.
 
 NEVER USE: #, ##, **double asterisks for bold**, numbered lists, | pipe tables, --- dividers, or _ underscores. These are standard Markdown and will appear as raw characters in Quotient.
 
-LINKS: Quotient renders a link written as "Link Text":https://url — the visible label in straight double quotes, immediately followed by a colon and the raw URL with NO space. Do NOT use Markdown link syntax [text](url). Reproduce the four Sandru Monitoring links exactly as given in the Why Video Monitoring? section; to bold the first link, wrap the whole "text":url in single asterisks (*"...":https://...*).
+LINKS: if a link is ever needed, Quotient renders "Link Text":https://url — the visible label in straight double quotes, then a colon, then the raw URL with NO space. Do NOT use Markdown link syntax [text](url).
 
 ASTRAGAL INSTALLATIONS — additional rules (apply when TYPE is Astragal Installation; these override the general system-opening rules wherever they conflict):
    - Title: "*Full-Door Interlocking Astragal Installation for [Property Name]*". When related access-control repairs are included, use "*Door Hardware Repairs + Astragal Installation for [Property Name]*".
@@ -5468,10 +5397,6 @@ TOTAL LABOR:${fmt(p.laborNet || p.laborGross || 0)}`;
         "Notes",
         "Materials",
         "Labor",
-        "Important Notice About Hardware Pricing",
-        "Terms and Conditions",
-        "Payment Terms",
-        "Notes and Exclusions",
       ];
 
       function splitProposalForQuotient(text) {
