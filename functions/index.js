@@ -112,8 +112,15 @@ exports.extractProposalData = onRequest(
     if (sourceText.length > 25000) {
       return res.status(400).json({ error: "Source information is too long (25,000 character maximum)." });
     }
-    if (!Array.isArray(formSchema) || !formSchema.length || formSchema.length > 250) {
-      return res.status(400).json({ error: "Invalid form schema." });
+    // Headroom: the UI sends every control across all tabs, so this grows each
+    // time a proposal type is added. The message names the cause -- a bare
+    // "Invalid form schema" gave no clue the cap was to blame.
+    const MAX_SCHEMA_FIELDS = 400;
+    if (!Array.isArray(formSchema) || !formSchema.length) {
+      return res.status(400).json({ error: "Invalid form schema: expected a non-empty array of form controls." });
+    }
+    if (formSchema.length > MAX_SCHEMA_FIELDS) {
+      return res.status(400).json({ error: "Form schema too large (" + formSchema.length + " controls, maximum " + MAX_SCHEMA_FIELDS + ")." });
     }
 
     const safeSchema = formSchema.map(field => ({

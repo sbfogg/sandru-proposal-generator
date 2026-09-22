@@ -4319,10 +4319,16 @@ Now generate the full proposal using this job data:
           return Array.from(
             root.querySelectorAll("input[id], select[id], textarea[id]"),
           )
-            .filter(
-              (control) =>
-                !["button", "submit", "hidden"].includes(control.type),
-            )
+            .filter((control) => {
+              if (["button", "submit", "hidden"].includes(control.type))
+                return false;
+              // Pricing policy and the fixed shop rate are never AI-filled, so
+              // sending them only bloats the schema against the server cap.
+              if (/-(lrate|ldisc|mdisc|odisc|tax)$/.test(control.id))
+                return false;
+              if (control.readOnly || control.disabled) return false;
+              return true;
+            })
             .map((control) => ({
               id: control.id,
               proposalType,
